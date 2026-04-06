@@ -1,0 +1,11 @@
+{
+    "name": "ronal/info2413_project",
+    "autoload": {
+        "psr-4": {
+            "Ronal\\Info2413Project\\": "src/"
+        }
+    },
+    "require": {
+        "phpmailer/phpmailer": "^7.0"
+    }
+}
