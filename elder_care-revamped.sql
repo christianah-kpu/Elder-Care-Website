@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Apr 07, 2026 at 06:32 AM
+-- Generation Time: Apr 07, 2026 at 07:08 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -127,7 +127,8 @@ CREATE TABLE `healthreport` (
 INSERT INTO `healthreport` (`reportID`, `residentSIN`, `empID`, `heartRate`, `bloodPressure`, `bloodSugar`, `temperature`, `dateOfCreation`, `dateEdited`) VALUES
 (1, '999999999', 2, 11, 123, 11, 11, '2026-04-06 19:53:00', '2026-04-06 19:53:00'),
 (2, '999999999', 2, 0, 0, 0, 0, '2026-04-06 20:49:25', '2026-04-06 20:49:25'),
-(3, '999999999', 2, 0, 0, 0, 0, '2026-04-06 21:18:23', '2026-04-06 21:18:23');
+(3, '999999999', 2, 0, 0, 0, 0, '2026-04-06 21:18:23', '2026-04-06 21:18:23'),
+(4, '999999999', 2, 11, 12, 11, 11, '2026-04-06 21:36:58', '2026-04-06 21:36:58');
 
 -- --------------------------------------------------------
 
@@ -170,7 +171,7 @@ CREATE TABLE `medication` (
 --
 
 INSERT INTO `medication` (`medID`, `residentSIN`, `empID`, `medName`, `dose`, `timeScheduled`, `dateCreated`) VALUES
-(1, '999999999', 2, 'MediCation IV', '12ml', '15:49:43', '2026-04-06 20:50:13'),
+(1, '999999999', 2, 'MediCation IV', '12ml', '15:30:00', '2026-04-06 20:50:13'),
 (3, '999999999', 2, 'paracetemol', '5ml', '22:40:00', '2026-04-06 21:28:41');
 
 -- --------------------------------------------------------
@@ -184,8 +185,16 @@ CREATE TABLE `medication_entry` (
   `medID` int(10) UNSIGNED NOT NULL,
   `reportID` int(10) UNSIGNED NOT NULL,
   `status` enum('delayed','pending','missed','taken') NOT NULL DEFAULT 'pending',
-  `timeTaken` time DEFAULT NULL
+  `timeTaken` time DEFAULT NULL,
+  `date` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `medication_entry`
+--
+
+INSERT INTO `medication_entry` (`entryID`, `medID`, `reportID`, `status`, `timeTaken`, `date`) VALUES
+(1, 1, 1, 'pending', NULL, '2026-04-06');
 
 -- --------------------------------------------------------
 
@@ -436,7 +445,7 @@ ALTER TABLE `familymember`
 -- AUTO_INCREMENT for table `healthreport`
 --
 ALTER TABLE `healthreport`
-  MODIFY `reportID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `reportID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `link`
@@ -454,7 +463,7 @@ ALTER TABLE `medication`
 -- AUTO_INCREMENT for table `medication_entry`
 --
 ALTER TABLE `medication_entry`
-  MODIFY `entryID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `entryID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `selfreport`
