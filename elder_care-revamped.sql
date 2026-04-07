@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Apr 07, 2026 at 07:08 AM
+-- Generation Time: Apr 07, 2026 at 08:29 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -172,7 +172,8 @@ CREATE TABLE `medication` (
 
 INSERT INTO `medication` (`medID`, `residentSIN`, `empID`, `medName`, `dose`, `timeScheduled`, `dateCreated`) VALUES
 (1, '999999999', 2, 'MediCation IV', '12ml', '15:30:00', '2026-04-06 20:50:13'),
-(3, '999999999', 2, 'paracetemol', '5ml', '22:40:00', '2026-04-06 21:28:41');
+(3, '999999999', 2, 'paracetemol', '5ml', '22:40:00', '2026-04-06 21:28:41'),
+(4, '123456789', 2, 'paracetemol', '50mg', '03:00:00', '2026-04-06 22:30:55');
 
 -- --------------------------------------------------------
 
@@ -194,7 +195,9 @@ CREATE TABLE `medication_entry` (
 --
 
 INSERT INTO `medication_entry` (`entryID`, `medID`, `reportID`, `status`, `timeTaken`, `date`) VALUES
-(1, 1, 1, 'pending', NULL, '2026-04-06');
+(1, 1, 1, 'pending', NULL, '2026-04-06'),
+(2, 3, 2, 'pending', NULL, '2026-04-06'),
+(3, 4, 2, 'pending', NULL, '2026-04-06');
 
 -- --------------------------------------------------------
 
@@ -377,8 +380,8 @@ ALTER TABLE `medication`
 --
 ALTER TABLE `medication_entry`
   ADD PRIMARY KEY (`entryID`),
-  ADD KEY `medID` (`medID`),
-  ADD KEY `reportID` (`reportID`);
+  ADD KEY `medication_entry_ibfk_1` (`medID`),
+  ADD KEY `medication_entry_ibfk_2` (`reportID`);
 
 --
 -- Indexes for table `resident`
@@ -457,13 +460,13 @@ ALTER TABLE `link`
 -- AUTO_INCREMENT for table `medication`
 --
 ALTER TABLE `medication`
-  MODIFY `medID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `medID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `medication_entry`
 --
 ALTER TABLE `medication_entry`
-  MODIFY `entryID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `entryID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `selfreport`
@@ -542,8 +545,8 @@ ALTER TABLE `medication`
 -- Constraints for table `medication_entry`
 --
 ALTER TABLE `medication_entry`
-  ADD CONSTRAINT `medication_entry_ibfk_1` FOREIGN KEY (`medID`) REFERENCES `medication` (`medID`),
-  ADD CONSTRAINT `medication_entry_ibfk_2` FOREIGN KEY (`reportID`) REFERENCES `healthreport` (`reportID`);
+  ADD CONSTRAINT `medication_entry_ibfk_1` FOREIGN KEY (`medID`) REFERENCES `medication` (`medID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `medication_entry_ibfk_2` FOREIGN KEY (`reportID`) REFERENCES `healthreport` (`reportID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `resident`
