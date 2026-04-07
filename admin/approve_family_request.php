@@ -42,11 +42,10 @@ if (isset($_POST['reject'])) {
 }
 
 // Fetch pending requests
-$stmt = $conn->query("
-    SELECT l.linkID, f.fname AS family_fname, f.lname AS family_lname,
-           r.fname AS resident_fname, r.lname AS resident_lname
-    FROM link l
+$stmt = $conn->query("SELECT l.linkID, u.username AS family_username, r.fname AS resident_fname, r.lname AS resident_lname
+    FROM link l 
     JOIN familymember f ON l.fmID = f.fmID
+    JOIN users u ON f.user_id = u.user_id
     JOIN resident r ON l.residentSIN = r.residentSIN
     WHERE l.status='pending'
 ");
@@ -59,7 +58,7 @@ $pending_links = $stmt->fetchAll();
     <table class="table table-bordered text-center">
         <thead class="table-primary">
             <tr>
-                <th>Family Name</th>
+                <th>Family Username</th>
                 <th>Resident Name</th>
                 <th>Action</th>
             </tr>
@@ -67,7 +66,7 @@ $pending_links = $stmt->fetchAll();
         <tbody>
             <?php foreach ($pending_links as $link): ?>
                 <tr>
-                    <td><?= htmlspecialchars($link['family_fname'] . ' ' . $link['family_lname']) ?></td>
+                    <td><?= htmlspecialchars($link['family_username']) ?></td>
                     <td><?= htmlspecialchars($link['resident_fname'] . ' ' . $link['resident_lname']) ?></td>
                     <td>
                         <form method="POST" style="display:inline;">
