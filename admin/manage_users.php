@@ -53,6 +53,23 @@ if (isset($_POST['toggle_status'])) {
 }
 
 // ===============================
+// HANDLE DELETE ACCOUNT - only applies to suspended accounts
+// ===============================
+if(isset($_POST['delete_acct'])) {
+    $user_id = $_POST['user_id'];
+    $current_status = $_POST['current_status'];
+
+    if ($current_status === 'suspended') {
+        $stmt = $conn->prepare("DELETE FROM users WHERE user_id=?");
+        $stmt->execute([$user_id]);
+    }
+
+    $_SESSION['flash_message'] = "User successfully deleted.";
+    header("Location: manage_users.php");
+    exit;
+}
+
+// ===============================
 // CREATE USER
 // ===============================
 if (isset($_POST['create_user'])) {
@@ -75,12 +92,14 @@ if (isset($_POST['create_user'])) {
         if ($role === 'resident') {
 
             if ($residentSIN === null || $residentSIN === '') {
-                echo "<div class='alert alert-danger'>SIN is required for residents</div>";
+                $_SESSION['flash_message'] = "SIN is required for residents";
+                header("Location: manage_users.php");
                 exit;
             }
 
             if (!preg_match('/^[0-9]{9}$/', $residentSIN)) {
-                echo "<div class='alert alert-danger'>SIN must be exactly 9 digits</div>";
+                $_SESSION['flash_message'] = "SIN must be axactly 9 digits.";
+                header("Location: manage_users.php");
                 exit;
             }
 
@@ -88,7 +107,8 @@ if (isset($_POST['create_user'])) {
             $checkSIN->execute([$residentSIN]);
 
             if ($checkSIN->fetch()) {
-                echo "<div class='alert alert-danger'>SIN already exists</div>";
+                $_SESSION['flash_message'] = "SIN already exits.";
+                header("Location: manage_users.php");
                 exit;
             }
         }
@@ -262,6 +282,15 @@ $users = $stmt->fetchAll();
                         <button type="submit" name="toggle_status" 
                                 class="btn btn-sm <?= $u['status']==='active'?'btn-danger':'btn-success' ?>">
                             <?= $u['status']==='active'?'Suspend':'Unsuspend' ?>
+                        </button>
+                    </form>
+                    <form method="POST">
+                        <input type="hidden" name="user_id" value="<?= $u['user_id'] ?>">
+                        <input type="hidden" name="current_status" value="<?= $u['status'] ?>">
+                        <!-- Button to delete account-->
+                        <button type="submit" name="delete_acct" 
+                                class="btn btn-sm btn-danger" <?= $u['status']==='active'?'hidden':'' ?> >
+                            Delete
                         </button>
                     </form>
                 </td>
