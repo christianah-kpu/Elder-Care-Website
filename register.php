@@ -9,7 +9,6 @@ require './includes/db_connection.php';
 require './includes/header.php';
 
 $errors = [];
-$success = '';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
@@ -17,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $email            = trim($_POST['email']);
     $password         = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
-    $role             = $_SESSION['role'] ?? 'family';
+    $role             = 'family';
 
     // Validate inputs
     if (empty($username)) {
@@ -72,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $stmt->execute([$userId, $verificationToken, $createdAt]);
 
                 // Send verification email
-                $verificationLink = "http://localhost/Elder-Care-Website-main/verify.php?token=$verificationToken";
+                $verificationLink = "http://localhost/Elder-Care-Website/verify.php?token=$verificationToken";
                 $mail = new PHPMailer(true);
 
                 try {

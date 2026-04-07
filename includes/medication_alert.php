@@ -97,3 +97,4 @@ function checkMissedMedications($conn) {
             
             $status = $existingLog['status'];
         }
+    }}

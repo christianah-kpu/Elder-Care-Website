@@ -2,7 +2,7 @@
 <?php
 require_once 'db_connection.php';
 
-define('BASE_URL', '/Elder-Care-Website-main/'); // Base url so pages can use it for links and redirects without worrying about relative paths
+define('BASE_URL', '/Elder-Care-Website/'); // Base url so pages can use it for links and redirects without worrying about relative paths
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

@@ -1,8 +1,9 @@
 <?php
+
 $servername="localhost";
 $username="root";
 $password="";
-$dbname="elder_care-revamped";
+$dbname="elder_care";
 
 try {
 	$dsn = "mysql:host=$servername;dbname=$dbname;charset=utf8mb4";

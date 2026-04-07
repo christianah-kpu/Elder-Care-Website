@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 06, 2026 at 01:11 PM
+-- Generation Time: Apr 06, 2026 at 11:18 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -53,7 +53,7 @@ CREATE TABLE `assignment` (
 --
 
 INSERT INTO `assignment` (`assignmentID`, `residentSIN`, `empID`) VALUES
-(4, 1, 1);
+(5, 123456789, 1);
 
 -- --------------------------------------------------------
 
@@ -106,7 +106,7 @@ INSERT INTO `familymember` (`fmID`, `user_id`, `fname`, `lname`, `phone`) VALUES
 
 CREATE TABLE `healthreport` (
   `reportID` int(10) UNSIGNED NOT NULL,
-  `residentSIN` int(10) UNSIGNED NOT NULL,
+  `residentSIN` varchar(9) NOT NULL,
   `empID` int(10) UNSIGNED NOT NULL,
   `heartRate` int(11) NOT NULL,
   `bloodPressure` int(11) NOT NULL,
@@ -124,17 +124,10 @@ CREATE TABLE `healthreport` (
 
 CREATE TABLE `link` (
   `linkID` int(10) UNSIGNED NOT NULL,
-  `residentSIN` int(9) UNSIGNED NOT NULL,
+  `residentSIN` varchar(9) NOT NULL,
   `fmID` int(8) UNSIGNED NOT NULL,
   `status` enum('pending','approved') NOT NULL DEFAULT 'pending'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `link`
---
-
-INSERT INTO `link` (`linkID`, `residentSIN`, `fmID`, `status`) VALUES
-(1, 1, 1, 'approved');
 
 -- --------------------------------------------------------
 
@@ -144,7 +137,7 @@ INSERT INTO `link` (`linkID`, `residentSIN`, `fmID`, `status`) VALUES
 
 CREATE TABLE `medication` (
   `medID` int(10) UNSIGNED NOT NULL,
-  `residentSIN` int(10) UNSIGNED NOT NULL,
+  `residentSIN` varchar(9) NOT NULL,
   `empID` int(10) UNSIGNED NOT NULL,
   `medName` varchar(100) NOT NULL,
   `dose` varchar(50) NOT NULL,
@@ -160,7 +153,7 @@ CREATE TABLE `medication` (
 --
 
 CREATE TABLE `resident` (
-  `residentSIN` int(9) UNSIGNED NOT NULL,
+  `residentSIN` varchar(9) NOT NULL,
   `user_id` int(11) NOT NULL,
   `DoB` date DEFAULT NULL,
   `phone` varchar(15) DEFAULT NULL,
@@ -177,7 +170,7 @@ CREATE TABLE `resident` (
 --
 
 INSERT INTO `resident` (`residentSIN`, `user_id`, `DoB`, `phone`, `profilePhoto`, `ECname`, `ECphone`, `ECemail`, `fname`, `lname`) VALUES
-(1, 18, NULL, '6048305765', NULL, 'Holy', NULL, NULL, 'Adam', 'Smith');
+('123456789', 22, NULL, NULL, NULL, NULL, NULL, NULL, 'Adam', 'Smith');
 
 -- --------------------------------------------------------
 
@@ -217,9 +210,9 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`user_id`, `username`, `email`, `password_hash`, `role`, `is_verified`, `created_at`) VALUES
 (4, 'login', 'login@email.com', '$2y$10$6iA/3VwcTRQ1GefE8ecfB.pg46aanfyZHIz5nYGXXJNVYrkwZEFwO', 'admin', 1, '2026-04-01 07:49:29'),
 (11, 'Jane', 'adeyemo123.ac@gmail.com', '$2y$10$EIQdyz7qEWJNZj2PEK32beZcq/d1EV6IcSwIK4T.lGlYeHzW2F8MG', 'family', 1, '2026-04-06 14:14:13'),
-(18, 'adam', 'theyebird.com@gmail.com', '$2y$10$nmiyxe12yrfED8N2Gzkp4OE32iBFtnLEvZ.mpypkLb13w5LEveUW6', 'resident', 1, '2026-04-06 06:58:29'),
 (20, 'Eve', 'evesmith@gmail.com', '$2y$10$G4y4D8GNl16FBcL8K0iKmem3OQg1Z9/qzVu.TntgEjsavmLzMxPlK', 'caregiver', 0, '2026-04-06 07:05:34'),
-(21, 'christianah', 'christianah123.ac@gmail.com', '$2y$10$K60bWal7TOaxPUpofIA6SOFmdgGoKU63LOPgR4uWtl3oYVqxq5Zim', 'family', 1, '2026-04-06 20:09:37');
+(21, 'christianah', 'christianah123.ac@gmail.com', '$2y$10$K60bWal7TOaxPUpofIA6SOFmdgGoKU63LOPgR4uWtl3oYVqxq5Zim', 'family', 1, '2026-04-06 20:09:37'),
+(22, 'adam', 'theyebird.com@gmail.com', '$2y$10$VZmkTUGilMffQX4cZDZQb.BLL8nQBPGYOQBQwHy9yJZM/eUD01FDW', 'resident', 1, '2026-04-06 20:31:32');
 
 -- --------------------------------------------------------
 
@@ -309,8 +302,8 @@ ALTER TABLE `familymember`
 --
 ALTER TABLE `healthreport`
   ADD PRIMARY KEY (`reportID`),
-  ADD KEY `fk_healthreport_resident` (`residentSIN`),
-  ADD KEY `fk_healthreport_caregiver` (`empID`);
+  ADD KEY `fk_healthreport_caregiver` (`empID`),
+  ADD KEY `fk_healthreport_resident` (`residentSIN`);
 
 --
 -- Indexes for table `link`
@@ -325,15 +318,16 @@ ALTER TABLE `link`
 --
 ALTER TABLE `medication`
   ADD PRIMARY KEY (`medID`),
-  ADD KEY `fk_med_resident` (`residentSIN`),
-  ADD KEY `fk_med_caregiver` (`empID`);
+  ADD KEY `fk_med_caregiver` (`empID`),
+  ADD KEY `fk_med_resident` (`residentSIN`);
 
 --
 -- Indexes for table `resident`
 --
 ALTER TABLE `resident`
   ADD PRIMARY KEY (`residentSIN`),
-  ADD UNIQUE KEY `user_id` (`user_id`);
+  ADD UNIQUE KEY `user_id` (`user_id`),
+  ADD UNIQUE KEY `residentSIN` (`residentSIN`);
 
 --
 -- Indexes for table `selfreport`
@@ -374,7 +368,7 @@ ALTER TABLE `administrator`
 -- AUTO_INCREMENT for table `assignment`
 --
 ALTER TABLE `assignment`
-  MODIFY `assignmentID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `assignmentID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `caregiver`
@@ -407,12 +401,6 @@ ALTER TABLE `medication`
   MODIFY `medID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `resident`
---
-ALTER TABLE `resident`
-  MODIFY `residentSIN` int(9) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
 -- AUTO_INCREMENT for table `selfreport`
 --
 ALTER TABLE `selfreport`
@@ -422,7 +410,7 @@ ALTER TABLE `selfreport`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `user_status`
@@ -434,7 +422,7 @@ ALTER TABLE `user_status`
 -- AUTO_INCREMENT for table `verification_tokens`
 --
 ALTER TABLE `verification_tokens`
-  MODIFY `tokenID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `tokenID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- Constraints for dumped tables
@@ -450,8 +438,7 @@ ALTER TABLE `administrator`
 -- Constraints for table `assignment`
 --
 ALTER TABLE `assignment`
-  ADD CONSTRAINT `fk_assignment_caregiver` FOREIGN KEY (`empID`) REFERENCES `caregiver` (`empID`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_assignment_resident` FOREIGN KEY (`residentSIN`) REFERENCES `resident` (`residentSIN`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk_assignment_caregiver` FOREIGN KEY (`empID`) REFERENCES `caregiver` (`empID`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `caregiver`
@@ -476,7 +463,7 @@ ALTER TABLE `healthreport`
 -- Constraints for table `link`
 --
 ALTER TABLE `link`
-  ADD CONSTRAINT `link_ibfk_1` FOREIGN KEY (`residentSIN`) REFERENCES `resident` (`residentSIN`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_link_resident` FOREIGN KEY (`residentSIN`) REFERENCES `resident` (`residentSIN`) ON DELETE CASCADE,
   ADD CONSTRAINT `link_ibfk_2` FOREIGN KEY (`fmID`) REFERENCES `familymember` (`fmID`) ON DELETE CASCADE;
 
 --
