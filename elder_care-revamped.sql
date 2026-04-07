@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Apr 06, 2026 at 11:18 PM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Host: 127.0.0.1:3306
+-- Generation Time: Apr 07, 2026 at 06:32 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -53,7 +53,9 @@ CREATE TABLE `assignment` (
 --
 
 INSERT INTO `assignment` (`assignmentID`, `residentSIN`, `empID`) VALUES
-(5, 123456789, 1);
+(5, 123456789, 1),
+(6, 999999999, 2),
+(7, 123456789, 2);
 
 -- --------------------------------------------------------
 
@@ -74,7 +76,8 @@ CREATE TABLE `caregiver` (
 --
 
 INSERT INTO `caregiver` (`empID`, `user_id`, `phone`, `fname`, `lname`) VALUES
-(1, 20, NULL, 'Eve', 'Smith');
+(1, 20, NULL, 'Eve', 'Smith'),
+(2, 25, NULL, 'blue', 'lamp');
 
 -- --------------------------------------------------------
 
@@ -96,7 +99,8 @@ CREATE TABLE `familymember` (
 
 INSERT INTO `familymember` (`fmID`, `user_id`, `fname`, `lname`, `phone`) VALUES
 (1, 11, NULL, NULL, NULL),
-(2, 21, NULL, NULL, NULL);
+(2, 21, NULL, NULL, NULL),
+(3, 27, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -116,6 +120,15 @@ CREATE TABLE `healthreport` (
   `dateEdited` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `healthreport`
+--
+
+INSERT INTO `healthreport` (`reportID`, `residentSIN`, `empID`, `heartRate`, `bloodPressure`, `bloodSugar`, `temperature`, `dateOfCreation`, `dateEdited`) VALUES
+(1, '999999999', 2, 11, 123, 11, 11, '2026-04-06 19:53:00', '2026-04-06 19:53:00'),
+(2, '999999999', 2, 0, 0, 0, 0, '2026-04-06 20:49:25', '2026-04-06 20:49:25'),
+(3, '999999999', 2, 0, 0, 0, 0, '2026-04-06 21:18:23', '2026-04-06 21:18:23');
+
 -- --------------------------------------------------------
 
 --
@@ -128,6 +141,13 @@ CREATE TABLE `link` (
   `fmID` int(8) UNSIGNED NOT NULL,
   `status` enum('pending','approved') NOT NULL DEFAULT 'pending'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `link`
+--
+
+INSERT INTO `link` (`linkID`, `residentSIN`, `fmID`, `status`) VALUES
+(2, '999999999', 3, 'approved');
 
 -- --------------------------------------------------------
 
@@ -142,8 +162,29 @@ CREATE TABLE `medication` (
   `medName` varchar(100) NOT NULL,
   `dose` varchar(50) NOT NULL,
   `timeScheduled` time NOT NULL,
-  `status` enum('given','missed','pending') NOT NULL DEFAULT 'pending',
   `dateCreated` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `medication`
+--
+
+INSERT INTO `medication` (`medID`, `residentSIN`, `empID`, `medName`, `dose`, `timeScheduled`, `dateCreated`) VALUES
+(1, '999999999', 2, 'MediCation IV', '12ml', '15:49:43', '2026-04-06 20:50:13'),
+(3, '999999999', 2, 'paracetemol', '5ml', '22:40:00', '2026-04-06 21:28:41');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `medication_entry`
+--
+
+CREATE TABLE `medication_entry` (
+  `entryID` int(10) UNSIGNED NOT NULL,
+  `medID` int(10) UNSIGNED NOT NULL,
+  `reportID` int(10) UNSIGNED NOT NULL,
+  `status` enum('delayed','pending','missed','taken') NOT NULL DEFAULT 'pending',
+  `timeTaken` time DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -170,7 +211,8 @@ CREATE TABLE `resident` (
 --
 
 INSERT INTO `resident` (`residentSIN`, `user_id`, `DoB`, `phone`, `profilePhoto`, `ECname`, `ECphone`, `ECemail`, `fname`, `lname`) VALUES
-('123456789', 22, NULL, NULL, NULL, NULL, NULL, NULL, 'Adam', 'Smith');
+('123456789', 22, NULL, NULL, NULL, NULL, NULL, NULL, 'Adam', 'Smith'),
+('999999999', 26, NULL, NULL, NULL, NULL, NULL, NULL, 'john', 'doe');
 
 -- --------------------------------------------------------
 
@@ -212,7 +254,10 @@ INSERT INTO `users` (`user_id`, `username`, `email`, `password_hash`, `role`, `i
 (11, 'Jane', 'adeyemo123.ac@gmail.com', '$2y$10$EIQdyz7qEWJNZj2PEK32beZcq/d1EV6IcSwIK4T.lGlYeHzW2F8MG', 'family', 1, '2026-04-06 14:14:13'),
 (20, 'Eve', 'evesmith@gmail.com', '$2y$10$G4y4D8GNl16FBcL8K0iKmem3OQg1Z9/qzVu.TntgEjsavmLzMxPlK', 'caregiver', 0, '2026-04-06 07:05:34'),
 (21, 'christianah', 'christianah123.ac@gmail.com', '$2y$10$K60bWal7TOaxPUpofIA6SOFmdgGoKU63LOPgR4uWtl3oYVqxq5Zim', 'family', 1, '2026-04-06 20:09:37'),
-(22, 'adam', 'theyebird.com@gmail.com', '$2y$10$VZmkTUGilMffQX4cZDZQb.BLL8nQBPGYOQBQwHy9yJZM/eUD01FDW', 'resident', 1, '2026-04-06 20:31:32');
+(22, 'adam', 'theyebird.com@gmail.com', '$2y$10$VZmkTUGilMffQX4cZDZQb.BLL8nQBPGYOQBQwHy9yJZM/eUD01FDW', 'resident', 1, '2026-04-06 20:31:32'),
+(25, 'blamp', 'blue@lamp.com', '$2y$10$ZbxL8h5WOKvXov86j7cmHeOC3iuIWtAWZmmI2k4H8xseYDgmCPpwu', 'caregiver', 1, '2026-04-07 02:18:43'),
+(26, 'jdoe', 'jdoe@doe.com', '$2y$10$0qxMN5.VXM7VEsP6wAXhhOxufqQNkhnAirjgyIsJrFYPurvU5nNye', 'resident', 1, '2026-04-07 02:19:12'),
+(27, 'Fmilliar', 'fa.milliar@email.com', '$2y$10$lXZNujqveZ0z6jVQ8CNP0ObeqFYzwji5pGQXJ6SmdBkLyYzj1pKIi', 'family', 1, '2026-04-07 11:20:05');
 
 -- --------------------------------------------------------
 
@@ -235,7 +280,10 @@ INSERT INTO `user_status` (`id`, `user_id`, `status`) VALUES
 (9, 11, 'active'),
 (11, 18, 'active'),
 (12, 20, 'active'),
-(13, 21, 'active');
+(13, 21, 'active'),
+(14, 24, 'suspended'),
+(15, 23, 'suspended'),
+(16, 27, 'active');
 
 -- --------------------------------------------------------
 
@@ -255,14 +303,8 @@ CREATE TABLE `verification_tokens` (
 --
 
 INSERT INTO `verification_tokens` (`tokenID`, `user_id`, `token`, `created_at`) VALUES
-(4, 4, '0', '2026-04-04 00:58:17'),
-(10, 13, '51f8edc4bb021e990bc6d3abd847697f', '2026-04-06 08:31:41'),
-(11, 14, 'd700afea4b86392f11d2494e348c072f', '2026-04-06 08:39:45'),
-(12, 15, '76ba087f3c1253546d44f04f8d8d6bd6', '2026-04-06 08:42:26'),
-(13, 16, '23cc164e1476470b93b71972ece20b89', '2026-04-06 08:43:12'),
-(14, 17, '94763cb63d6e34f7ad762513dec5b965', '2026-04-06 08:52:12'),
-(16, 19, '06b30e55e1f757800ee837962a389c90', '2026-04-06 09:02:42'),
-(17, 20, 'e8b5e89829fb0d83f2165a49e958b6cf', '2026-04-06 09:05:34');
+(20, 23, '002711e8c830b6690578c691a048cb3f', '2026-04-07 03:13:44'),
+(21, 24, '780483f7e737534080bfaa6438f74402', '2026-04-07 03:14:38');
 
 --
 -- Indexes for dumped tables
@@ -322,6 +364,14 @@ ALTER TABLE `medication`
   ADD KEY `fk_med_resident` (`residentSIN`);
 
 --
+-- Indexes for table `medication_entry`
+--
+ALTER TABLE `medication_entry`
+  ADD PRIMARY KEY (`entryID`),
+  ADD KEY `medID` (`medID`),
+  ADD KEY `reportID` (`reportID`);
+
+--
 -- Indexes for table `resident`
 --
 ALTER TABLE `resident`
@@ -368,37 +418,43 @@ ALTER TABLE `administrator`
 -- AUTO_INCREMENT for table `assignment`
 --
 ALTER TABLE `assignment`
-  MODIFY `assignmentID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `assignmentID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `caregiver`
 --
 ALTER TABLE `caregiver`
-  MODIFY `empID` int(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `empID` int(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `familymember`
 --
 ALTER TABLE `familymember`
-  MODIFY `fmID` int(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `fmID` int(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `healthreport`
 --
 ALTER TABLE `healthreport`
-  MODIFY `reportID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `reportID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `link`
 --
 ALTER TABLE `link`
-  MODIFY `linkID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `linkID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `medication`
 --
 ALTER TABLE `medication`
-  MODIFY `medID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `medID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `medication_entry`
+--
+ALTER TABLE `medication_entry`
+  MODIFY `entryID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `selfreport`
@@ -410,19 +466,19 @@ ALTER TABLE `selfreport`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `user_status`
 --
 ALTER TABLE `user_status`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `verification_tokens`
 --
 ALTER TABLE `verification_tokens`
-  MODIFY `tokenID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `tokenID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- Constraints for dumped tables
@@ -472,6 +528,13 @@ ALTER TABLE `link`
 ALTER TABLE `medication`
   ADD CONSTRAINT `fk_med_caregiver` FOREIGN KEY (`empID`) REFERENCES `caregiver` (`empID`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_med_resident` FOREIGN KEY (`residentSIN`) REFERENCES `resident` (`residentSIN`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `medication_entry`
+--
+ALTER TABLE `medication_entry`
+  ADD CONSTRAINT `medication_entry_ibfk_1` FOREIGN KEY (`medID`) REFERENCES `medication` (`medID`),
+  ADD CONSTRAINT `medication_entry_ibfk_2` FOREIGN KEY (`reportID`) REFERENCES `healthreport` (`reportID`);
 
 --
 -- Constraints for table `resident`
