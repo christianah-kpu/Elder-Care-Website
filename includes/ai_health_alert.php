@@ -77,19 +77,19 @@ function checkHealthTrend($conn, $residentSIN) {
     
     // Get resident name
     $rStmt = $conn->prepare("
-        SELECT name FROM resident WHERE residentSIN = ?
+    SELECT fname, lname FROM resident WHERE residentSIN = ?
     ");
     $rStmt->execute([$residentSIN]);
-    $residentRow  = $rStmt->fetch();
-    $residentName = $residentRow['name'];
+    $residentRow = $rStmt->fetch();
+    $residentName = $residentRow['fname'] . ' ' . $residentRow['lname'];
 
     
     // Get assigned caregivers emails
     $cgStmt = $conn->prepare("
-        SELECT u.email, c.name
+        SELECT u.email, c.fname, c.lname
         FROM assignment a
         JOIN caregiver c ON a.empID = c.empID
-        JOIN users u ON c.username = u.username
+        JOIN users u ON c.user_id = u.user_id
         WHERE a.residentSIN = ?
     ");
     $cgStmt->execute([$residentSIN]);
@@ -98,10 +98,10 @@ function checkHealthTrend($conn, $residentSIN) {
     
     // Get linked family members emails
     $fmStmt = $conn->prepare("
-        SELECT u.email, f.name
+        SELECT u.email, f.fname, f.lname
         FROM link l
         JOIN familymember f ON l.fmID = f.fmID
-        JOIN users u ON f.username = u.username
+        JOIN users u ON f.user_id = u.user_id
         WHERE l.residentSIN = ?
     ");
     $fmStmt->execute([$residentSIN]);
@@ -132,16 +132,20 @@ function checkHealthTrend($conn, $residentSIN) {
    $sentEmails = []; // track which emails we already sent to
 
 foreach ($caregivers as $cg) {
+    $fullName = $cg['fname'] . ' ' . $cg['lname'];
+
     if (!in_array($cg['email'], $sentEmails)) {
-        sendAlertEmail($cg['email'], $cg['name'], $subject, $body);
-        $sentEmails[] = $cg['email']; // mark as sent
+        sendAlertEmail($cg['email'], $fullName, $subject, $body);
+        $sentEmails[] = $cg['email'];
     }
 }
 
 foreach ($familyMembers as $fm) {
+    $fullName = $fm['fname'] . ' ' . $fm['lname'];
+
     if (!in_array($fm['email'], $sentEmails)) {
-        sendAlertEmail($fm['email'], $fm['name'], $subject, $body);
-        $sentEmails[] = $fm['email']; // mark as sent
+        sendAlertEmail($fm['email'], $fullName, $subject, $body);
+        $sentEmails[] = $fm['email'];
     }
 }
 

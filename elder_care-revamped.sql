@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1:3306
--- Generation Time: Apr 07, 2026 at 08:29 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: localhost
+-- Generation Time: Apr 07, 2026 at 11:49 PM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -35,6 +35,27 @@ CREATE TABLE `administrator` (
   `email` varchar(100) NOT NULL,
   `phone` varchar(15) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ai_trend_log`
+--
+
+CREATE TABLE `ai_trend_log` (
+  `trendID` int(10) UNSIGNED NOT NULL,
+  `residentSIN` varchar(9) NOT NULL,
+  `consecutive_abnormal_count` int(11) DEFAULT 0,
+  `alert_sent` tinyint(1) DEFAULT 0,
+  `last_checked` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `ai_trend_log`
+--
+
+INSERT INTO `ai_trend_log` (`trendID`, `residentSIN`, `consecutive_abnormal_count`, `alert_sent`, `last_checked`) VALUES
+(2, '123456789', 3, 1, '2026-04-07 14:48:39');
 
 -- --------------------------------------------------------
 
@@ -128,7 +149,10 @@ INSERT INTO `healthreport` (`reportID`, `residentSIN`, `empID`, `heartRate`, `bl
 (1, '999999999', 2, 11, 123, 11, 11, '2026-04-06 19:53:00', '2026-04-06 19:53:00'),
 (2, '999999999', 2, 0, 0, 0, 0, '2026-04-06 20:49:25', '2026-04-06 20:49:25'),
 (3, '999999999', 2, 0, 0, 0, 0, '2026-04-06 21:18:23', '2026-04-06 21:18:23'),
-(4, '999999999', 2, 11, 12, 11, 11, '2026-04-06 21:36:58', '2026-04-06 21:36:58');
+(4, '999999999', 2, 11, 12, 11, 11, '2026-04-06 21:36:58', '2026-04-06 21:36:58'),
+(10, '123456789', 2, 200, 200, 500, 300, '2026-04-07 14:48:08', '2026-04-07 14:48:08'),
+(11, '123456789', 2, 4238824, 500, 290049, 52995, '2026-04-07 14:48:20', '2026-04-07 14:48:20'),
+(12, '123456789', 2, 838838, 8888494, 299299, 993939, '2026-04-07 14:48:34', '2026-04-07 14:48:34');
 
 -- --------------------------------------------------------
 
@@ -265,11 +289,11 @@ INSERT INTO `users` (`user_id`, `username`, `email`, `password_hash`, `role`, `i
 (4, 'login', 'login@email.com', '$2y$10$6iA/3VwcTRQ1GefE8ecfB.pg46aanfyZHIz5nYGXXJNVYrkwZEFwO', 'admin', 1, '2026-04-01 07:49:29'),
 (11, 'Jane', 'adeyemo123.ac@gmail.com', '$2y$10$EIQdyz7qEWJNZj2PEK32beZcq/d1EV6IcSwIK4T.lGlYeHzW2F8MG', 'family', 1, '2026-04-06 14:14:13'),
 (20, 'Eve', 'evesmith@gmail.com', '$2y$10$G4y4D8GNl16FBcL8K0iKmem3OQg1Z9/qzVu.TntgEjsavmLzMxPlK', 'caregiver', 0, '2026-04-06 07:05:34'),
-(21, 'christianah', 'christianah123.ac@gmail.com', '$2y$10$K60bWal7TOaxPUpofIA6SOFmdgGoKU63LOPgR4uWtl3oYVqxq5Zim', 'family', 1, '2026-04-06 20:09:37'),
+(21, 'christianah', 'chris123.ac@gmail.com', '$2y$10$K60bWal7TOaxPUpofIA6SOFmdgGoKU63LOPgR4uWtl3oYVqxq5Zim', 'family', 1, '2026-04-06 20:09:37'),
 (22, 'adam', 'theyebird.com@gmail.com', '$2y$10$VZmkTUGilMffQX4cZDZQb.BLL8nQBPGYOQBQwHy9yJZM/eUD01FDW', 'resident', 1, '2026-04-06 20:31:32'),
 (25, 'blamp', 'blue@lamp.com', '$2y$10$ZbxL8h5WOKvXov86j7cmHeOC3iuIWtAWZmmI2k4H8xseYDgmCPpwu', 'caregiver', 1, '2026-04-07 02:18:43'),
 (26, 'jdoe', 'jdoe@doe.com', '$2y$10$0qxMN5.VXM7VEsP6wAXhhOxufqQNkhnAirjgyIsJrFYPurvU5nNye', 'resident', 1, '2026-04-07 02:19:12'),
-(27, 'Fmilliar', 'fa.milliar@email.com', '$2y$10$lXZNujqveZ0z6jVQ8CNP0ObeqFYzwji5pGQXJ6SmdBkLyYzj1pKIi', 'family', 1, '2026-04-07 11:20:05');
+(27, 'Fmilliar', 'christianah123.ac@gmail.com', '$2y$10$lXZNujqveZ0z6jVQ8CNP0ObeqFYzwji5pGQXJ6SmdBkLyYzj1pKIi', 'family', 1, '2026-04-07 11:20:05');
 
 -- --------------------------------------------------------
 
@@ -328,6 +352,13 @@ INSERT INTO `verification_tokens` (`tokenID`, `user_id`, `token`, `created_at`) 
 ALTER TABLE `administrator`
   ADD PRIMARY KEY (`adminID`),
   ADD KEY `fk_admin_user` (`user_id`);
+
+--
+-- Indexes for table `ai_trend_log`
+--
+ALTER TABLE `ai_trend_log`
+  ADD PRIMARY KEY (`trendID`),
+  ADD UNIQUE KEY `unique_resident` (`residentSIN`);
 
 --
 -- Indexes for table `assignment`
@@ -427,6 +458,12 @@ ALTER TABLE `administrator`
   MODIFY `adminID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `ai_trend_log`
+--
+ALTER TABLE `ai_trend_log`
+  MODIFY `trendID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT for table `assignment`
 --
 ALTER TABLE `assignment`
@@ -448,7 +485,7 @@ ALTER TABLE `familymember`
 -- AUTO_INCREMENT for table `healthreport`
 --
 ALTER TABLE `healthreport`
-  MODIFY `reportID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `reportID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `link`
@@ -501,6 +538,12 @@ ALTER TABLE `verification_tokens`
 --
 ALTER TABLE `administrator`
   ADD CONSTRAINT `fk_admin_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `ai_trend_log`
+--
+ALTER TABLE `ai_trend_log`
+  ADD CONSTRAINT `fk_trend_resident` FOREIGN KEY (`residentSIN`) REFERENCES `resident` (`residentSIN`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `assignment`
