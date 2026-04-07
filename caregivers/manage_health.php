@@ -29,7 +29,6 @@ $cgRow = $stmt->fetch();
 if (!$cgRow) {
     die("Caregiver not found.");
 }
-
 $empID = $cgRow['empID'];
 
 // ===============================
@@ -49,63 +48,69 @@ $residents = $resStmt->fetchAll();
 // ===============================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $residentSIN   = $_POST['resident_id']; // VARCHAR, no casting
-    $bloodPressure = (int) $_POST['blood_pressure'];
-    $bloodSugar    = (float) $_POST['blood_sugar'];
-    $temperature   = (float) $_POST['temperature'];
-    $heartRate     = (int) $_POST['heart_rate'];
-
-    $medicineName  = trim($_POST['medicine_name']);
-    $dose          = trim($_POST['dose']);
-    $scheduledTime = $_POST['time'];
 
     try {
         // ===============================
         // INSERT HEALTH DATA (FIXED)
         // ===============================
-        $stmt = $conn->prepare("
-            INSERT INTO healthreport 
-            (residentSIN, empID, heartRate, bloodPressure, bloodSugar, temperature, dateOfCreation, dateEdited)
-            VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())
-        ");
+        if(isset($_POST['report'])) {
+            $residentSIN   = $_POST['resident_id']; // VARCHAR, no casting
+            $bloodPressure = (int) $_POST['blood_pressure'];
+            $bloodSugar    = (float) $_POST['blood_sugar'];
+            $temperature   = (float) $_POST['temperature'];
+            $heartRate     = (int) $_POST['heart_rate'];
+            $stmt = $conn->prepare("
+                INSERT INTO healthreport 
+                (residentSIN, empID, heartRate, bloodPressure, bloodSugar, temperature, dateOfCreation, dateEdited)
+                VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())
+            ");
 
-        $stmt->execute([
-            $residentSIN,
-            $empID,
-            $heartRate,
-            $bloodPressure,
-            $bloodSugar,
-            $temperature
-        ]);
+            $stmt->execute([
+                $residentSIN,
+                $empID,
+                $heartRate,
+                $bloodPressure,
+                $bloodSugar,
+                $temperature
+            ]);
+            $success = "Health data saved successfully.";
 
+            // ===============================
+            // RUN AI CHECK
+            // ===============================
+            checkHealthTrend($conn, $residentSIN);
+        }
+
+    } catch (PDOException $e) {
+        $error = "Error: " . $e->getMessage();
+    }
+
+        try {
         // ===============================
         // INSERT MEDICATION (OPTIONAL)
         // ===============================
-        if (!empty($medicineName)) {
-
+        if (isset($_POST['newMed'])) {
+            $residentSIN   = $_POST['resident_id']; // VARCHAR, no casting
+            $medicineName  = trim($_POST['medicine_name']);
+            $dose          = trim($_POST['dose']);
+            $scheduledTime = $_POST['time'];
             $timeOnly = date('H:i:s', strtotime($scheduledTime));
 
             $medStmt = $conn->prepare("
                 INSERT INTO medication 
-                (medicine_name, residentSIN, scheduledTime, dose)
-                VALUES (?, ?, ?, ?)
+                (residentSIN, empID, medName, dose, timeScheduled)
+                VALUES (?, ?, ?, ?, ?)
             ");
 
             $medStmt->execute([
+                $residentSIN, 
+                $empID,   
                 $medicineName,
-                $residentSIN,
-                $timeOnly,
-                $dose
+                $dose,
+                $timeOnly
             ]);
+            $success = "New Medication Saved Successfully.";
         }
-
-        $success = "Health data saved successfully.";
-
-        // ===============================
-        // RUN AI CHECK
-        // ===============================
-        checkHealthTrend($conn, $residentSIN);
-
     } catch (PDOException $e) {
         $error = "Error: " . $e->getMessage();
     }
@@ -127,21 +132,22 @@ include '../includes/header.php';
 
     <div class="card shadow p-4">
         <form method="POST">
-
+        <h5>Todays Health Report</h5>
             <!-- RESIDENT SELECT -->
             <div class="mb-3">
                 <label class="form-label">Resident</label>
                 <select class="form-select" name="resident_id" required>
-                    <option value="">-- Select Resident --</option>
+                    <option value="" selected disabled>-- Select Resident --</option>
                     <?php foreach ($residents as $r): ?>
                         <option value="<?= $r['residentSIN'] ?>">
-                            <?= htmlspecialchars($r['fname'] . ' ' . $r['lname']) ?>
+                            <?= htmlspecialchars($r['fname'] . ' ' . $r['lname'] . ' (' . $r['residentSIN'] . ')') ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
             </div>
 
             <!-- VITALS -->
+            <label class="form-label">Vitals</label>
             <div class="row">
                 <div class="col-md-3">
                     <input type="number" name="blood_pressure" class="form-control mb-2" placeholder="Blood Pressure" required>
@@ -156,17 +162,35 @@ include '../includes/header.php';
                     <input type="number" name="heart_rate" class="form-control mb-2" placeholder="Heart Rate" required>
                 </div>
             </div>
-
+            <button type="submit" class="btn btn-success w-100" name="report" value="reportSave">
+                Save Health Report
+            </button>
+        </form>
+    </div>
+    
+    <div class="card shadow p-4" style="margin-top: 1rem">
+        <form method="POST">
             <!-- MEDICATION -->
-            <h5>Medication (optional)</h5>
-
+            <h5>Schedule New Medication</h5>
+                        <!-- RESIDENT SELECT -->
+            <div class="mb-3">
+                <label class="form-label">Resident</label>
+                <select class="form-select" name="resident_id" required>
+                    <option value="" selected disabled>-- Select Resident --</option>
+                    <?php foreach ($residents as $r): ?>
+                        <option value="<?= $r['residentSIN'] ?>">
+                            <?= htmlspecialchars($r['fname'] . ' ' . $r['lname'] . ' (' . $r['residentSIN'] . ')') ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
             <input type="text" name="medicine_name" class="form-control mb-2" placeholder="Medicine Name">
             <input type="text" name="dose" class="form-control mb-2" placeholder="Dose">
 
             <input type="datetime-local" name="time" class="form-control mb-3">
 
-            <button type="submit" class="btn btn-success w-100">
-                Save Health Data
+            <button type="submit" class="btn btn-success w-100" name="newMed" value="medicationSave">
+                Save New Medication
             </button>
 
         </form>
