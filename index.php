@@ -3,7 +3,28 @@
     ini_set('display_errors', 1);
     error_reporting(E_ALL);
 
-    include 'includes/header.php'; 
+    include 'includes/header.php';
+
+
+//sets the link for dashboard redirect
+    $dash_link = '';
+    if (isset($_SESSION['role'])) {
+        switch($_SESSION['role']) {
+                case 'admin':
+                    $dash_link = "admin\dashboard.php";
+                    break;
+                case 'family':
+                    $dash_link = "family\dashboard.php";
+                    break;
+                case 'caregiver':    
+                    $dash_link = "caregivers\dashboard.php";
+                    break;
+                case 'resident':
+                    $dash_link = "residents\dashboard.php";
+                    break;
+                default: break;
+            }
+    }
 ?>
 
 <!-- Hero Section -->
@@ -11,8 +32,13 @@
     <div class="container">
         <h1>Welcome to Elder Care Home Management System</h1>
         <p class="lead">Streamline care, improve communication, and ensure resident wellbeing</p>
-        <a href="login.php" class="btn btn-light btn-lg mt-3">Login</a>
-        <a href="register.php" class="btn btn-outline-light btn-lg mt-3">Sign Up</a>
+        <?= 
+        isset($_SESSION['role'])?
+            "<a href=\"$dash_link\" class=\"btn btn-light btn-lg mt-3\">Go To Dashboard</a>":
+            '<a href="login.php" class="btn btn-light btn-lg mt-3">Login</a>
+            <a href="register.php" class="btn btn-outline-light btn-lg mt-3">Sign Up</a>'
+        ?>
+        
     </div>
 </header>
 
