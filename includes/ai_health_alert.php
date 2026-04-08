@@ -76,7 +76,7 @@ function checkHealthTrend($conn, $residentSIN) {
     if ($avgBP > $BP_HIGH) {
         $issues[]  = "Blood Pressure avg <strong>" . round($avgBP, 1) . " mmHg</strong> is HIGH (normal: {$BP_LOW}–{$BP_HIGH} mmHg)";
         $declining = true;
-    } elseif ($avgBP < $BP_LOW) {
+    } elseif ($avgBP <= $BP_LOW) {
         $issues[]  = "Blood Pressure avg <strong>" . round($avgBP, 1) . " mmHg</strong> is LOW (normal: {$BP_LOW}–{$BP_HIGH} mmHg)";
         $declining = true;
     }
