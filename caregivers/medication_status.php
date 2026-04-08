@@ -1,4 +1,5 @@
 <?php
+$page_title = "Medication Status";
 include '../includes/header.php';
 require_once '../includes/db_connection.php';
 //require_once __DIR__ . '/../includes/medication_alert.php';
