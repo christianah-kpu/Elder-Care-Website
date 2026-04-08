@@ -1,15 +1,15 @@
 <?php
+// approve_family_request.php
+
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 $page_title = "Approve Family Requests";
-
 session_start();
 require_once '../includes/db_connection.php';
 include '../includes/header.php';
 
-
-// Check admin
+// Only admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../login.php");
     exit;
@@ -21,35 +21,45 @@ if (isset($_SESSION['flash_message'])) {
     unset($_SESSION['flash_message']);
 }
 
-// Handle approve
+// Approve request
 if (isset($_POST['approve'])) {
     $linkID = $_POST['linkID'];
+
     $stmt = $conn->prepare("UPDATE link SET status='approved' WHERE linkID=?");
     $stmt->execute([$linkID]);
+
     $_SESSION['flash_message'] = "Request approved!";
     header("Location: approve_family_request.php");
     exit;
 }
 
-// Handle reject (optional)
+// Reject request
 if (isset($_POST['reject'])) {
     $linkID = $_POST['linkID'];
+
     $stmt = $conn->prepare("DELETE FROM link WHERE linkID=?");
     $stmt->execute([$linkID]);
+
     $_SESSION['flash_message'] = "Request rejected!";
     header("Location: approve_family_request.php");
     exit;
 }
 
-// Fetch pending requests
-$stmt = $conn->query("SELECT l.linkID, u.username AS family_username, r.fname AS resident_fname, r.lname AS resident_lname
-    FROM link l 
+// Fetch pending requests FROM LINK TABLE
+$stmt = $conn->query("
+    SELECT 
+        l.linkID,
+        u.username AS family_username,
+        r.fname AS resident_fname,
+        r.lname AS resident_lname
+    FROM link l
     JOIN familymember f ON l.fmID = f.fmID
     JOIN users u ON f.user_id = u.user_id
     JOIN resident r ON l.residentSIN = r.residentSIN
-    WHERE l.status='pending'
+    WHERE l.status = 'pending'
 ");
-$pending_links = $stmt->fetchAll();
+
+$pending_requests = $stmt->fetchAll();
 ?>
 
 <div class="container py-4">
@@ -64,19 +74,25 @@ $pending_links = $stmt->fetchAll();
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($pending_links as $link): ?>
+            <?php foreach ($pending_requests as $req): ?>
                 <tr>
-                    <td><?= htmlspecialchars($link['family_username']) ?></td>
-                    <td><?= htmlspecialchars($link['resident_fname'] . ' ' . $link['resident_lname']) ?></td>
+                    <td><?= htmlspecialchars($req['family_username']) ?></td>
+                    <td><?= htmlspecialchars($req['resident_fname'] . ' ' . $req['resident_lname']) ?></td>
                     <td>
                         <form method="POST" style="display:inline;">
-                            <input type="hidden" name="linkID" value="<?= $link['linkID'] ?>">
+                            <input type="hidden" name="linkID" value="<?= $req['linkID'] ?>">
                             <button type="submit" name="approve" class="btn btn-success btn-sm">Approve</button>
                             <button type="submit" name="reject" class="btn btn-danger btn-sm">Reject</button>
                         </form>
                     </td>
                 </tr>
             <?php endforeach; ?>
+
+            <?php if (empty($pending_requests)): ?>
+                <tr>
+                    <td colspan="3">No pending requests.</td>
+                </tr>
+            <?php endif; ?>
         </tbody>
     </table>
 </div>

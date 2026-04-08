@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 07, 2026 at 11:49 PM
+-- Generation Time: Apr 08, 2026 at 03:26 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -98,7 +98,8 @@ CREATE TABLE `caregiver` (
 
 INSERT INTO `caregiver` (`empID`, `user_id`, `phone`, `fname`, `lname`) VALUES
 (1, 20, NULL, 'Eve', 'Smith'),
-(2, 25, NULL, 'blue', 'lamp');
+(2, 25, NULL, 'blue', 'lamp'),
+(3, 29, NULL, 'Dam', 'Sel');
 
 -- --------------------------------------------------------
 
@@ -122,6 +123,20 @@ INSERT INTO `familymember` (`fmID`, `user_id`, `fname`, `lname`, `phone`) VALUES
 (1, 11, NULL, NULL, NULL),
 (2, 21, NULL, NULL, NULL),
 (3, 27, NULL, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `family_requests`
+--
+
+CREATE TABLE `family_requests` (
+  `request_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `fname` varchar(50) NOT NULL,
+  `lname` varchar(50) NOT NULL,
+  `phone` varchar(15) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -172,7 +187,8 @@ CREATE TABLE `link` (
 --
 
 INSERT INTO `link` (`linkID`, `residentSIN`, `fmID`, `status`) VALUES
-(2, '999999999', 3, 'approved');
+(2, '999999999', 3, 'approved'),
+(4, '123456789', 2, 'approved');
 
 -- --------------------------------------------------------
 
@@ -293,7 +309,8 @@ INSERT INTO `users` (`user_id`, `username`, `email`, `password_hash`, `role`, `i
 (22, 'adam', 'theyebird.com@gmail.com', '$2y$10$VZmkTUGilMffQX4cZDZQb.BLL8nQBPGYOQBQwHy9yJZM/eUD01FDW', 'resident', 1, '2026-04-06 20:31:32'),
 (25, 'blamp', 'blue@lamp.com', '$2y$10$ZbxL8h5WOKvXov86j7cmHeOC3iuIWtAWZmmI2k4H8xseYDgmCPpwu', 'caregiver', 1, '2026-04-07 02:18:43'),
 (26, 'jdoe', 'jdoe@doe.com', '$2y$10$0qxMN5.VXM7VEsP6wAXhhOxufqQNkhnAirjgyIsJrFYPurvU5nNye', 'resident', 1, '2026-04-07 02:19:12'),
-(27, 'Fmilliar', 'christianah123.ac@gmail.com', '$2y$10$lXZNujqveZ0z6jVQ8CNP0ObeqFYzwji5pGQXJ6SmdBkLyYzj1pKIi', 'family', 1, '2026-04-07 11:20:05');
+(27, 'Fmilliar', 'christianah123.ac@gmail.com', '$2y$10$lXZNujqveZ0z6jVQ8CNP0ObeqFYzwji5pGQXJ6SmdBkLyYzj1pKIi', 'family', 1, '2026-04-07 11:20:05'),
+(29, 'Dam', 'dam@gmail.com', '$2y$10$G0GmP5aWyprb7ErAVK6bVeeSAl.JOBccRl4nalxi9gglc3QU3U8QG', 'caregiver', 0, '2026-04-08 01:15:05');
 
 -- --------------------------------------------------------
 
@@ -340,7 +357,8 @@ CREATE TABLE `verification_tokens` (
 
 INSERT INTO `verification_tokens` (`tokenID`, `user_id`, `token`, `created_at`) VALUES
 (20, 23, '002711e8c830b6690578c691a048cb3f', '2026-04-07 03:13:44'),
-(21, 24, '780483f7e737534080bfaa6438f74402', '2026-04-07 03:14:38');
+(21, 24, '780483f7e737534080bfaa6438f74402', '2026-04-07 03:14:38'),
+(26, 29, '180b27a6350d8d5908c089388e8ce368', '2026-04-08 03:15:05');
 
 --
 -- Indexes for dumped tables
@@ -381,6 +399,13 @@ ALTER TABLE `caregiver`
 ALTER TABLE `familymember`
   ADD PRIMARY KEY (`fmID`),
   ADD UNIQUE KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `family_requests`
+--
+ALTER TABLE `family_requests`
+  ADD PRIMARY KEY (`request_id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `healthreport`
@@ -473,13 +498,19 @@ ALTER TABLE `assignment`
 -- AUTO_INCREMENT for table `caregiver`
 --
 ALTER TABLE `caregiver`
-  MODIFY `empID` int(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `empID` int(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `familymember`
 --
 ALTER TABLE `familymember`
-  MODIFY `fmID` int(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `fmID` int(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `family_requests`
+--
+ALTER TABLE `family_requests`
+  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `healthreport`
@@ -491,7 +522,7 @@ ALTER TABLE `healthreport`
 -- AUTO_INCREMENT for table `link`
 --
 ALTER TABLE `link`
-  MODIFY `linkID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `linkID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `medication`
@@ -515,7 +546,7 @@ ALTER TABLE `selfreport`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `user_status`
@@ -527,7 +558,7 @@ ALTER TABLE `user_status`
 -- AUTO_INCREMENT for table `verification_tokens`
 --
 ALTER TABLE `verification_tokens`
-  MODIFY `tokenID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `tokenID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- Constraints for dumped tables
@@ -562,6 +593,12 @@ ALTER TABLE `caregiver`
 --
 ALTER TABLE `familymember`
   ADD CONSTRAINT `familymember_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `family_requests`
+--
+ALTER TABLE `family_requests`
+  ADD CONSTRAINT `family_requests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `healthreport`
