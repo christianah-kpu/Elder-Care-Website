@@ -1,73 +1,70 @@
 <?php
 // -----------------------------------------------
-// email_service.php
-// This file handles sending all alert emails in the system.
-// It uses PHPMailer (already installed by your teammate).
-// This function is called by ai_health_alert.php 
-// and medication_alert.php whenever an alert needs to be sent.
-// ------------------------------------------------
+// email_service.php  
+// Sends all HTML alert emails in the system.
+// Called by ai_health_alert.php and medication_alert.php.
+// -----------------------------------------------
 
-// Import PHPMailer classes
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-// Load PHPMailer from vendor folder (installed by composer)
-// vendor folder is at the project root, one level up from includes/
+// vendor/ is at the project root, one level up from includes/
 require_once __DIR__ . '/../vendor/autoload.php';
 
-// ------------------------------------------------
+// -----------------------------------------------
 // sendAlertEmail()
-// Sends an HTML email to one recipient.
-//
 // Parameters:
-//   $toEmail  - the recipient's email address
-//   $toName   - the recipient's name (shown in email client)
-//   $subject  - the email subject line
-//   $body     - the HTML content of the email
-//
-// Returns true if sent successfully, false if it failed.
-// ------------------------------------------------
+//   $toEmail  — recipient email address
+//   $toName   — recipient display name
+//   $subject  — email subject line
+//   $body     — HTML body content
+// Returns true on success, false on failure.
+// -----------------------------------------------
 function sendAlertEmail($toEmail, $toName, $subject, $body) {
 
-    // Create a new PHPMailer instance
-    // true = enable exceptions so errors are catchable
     $mail = new PHPMailer(true);
 
     try {
-        
-        // SMTP Configuration
-        // Using Gmail SMTP to send emails
-        // Same credentials already used in register.php
-        
+        // SMTP via Gmail
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'ronaldo.sony1898@gmail.com'; // Gmail address
-        $mail->Password   = 'jqlw fjem goyh ztam';        // Gmail app password
+        $mail->Username   = 'ronaldo.sony1898@gmail.com';
+        $mail->Password   = 'jqlw fjem goyh ztam';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 
-        
-        // Email sender and recipient
-        
+        // Sender and recipient
         $mail->setFrom('ronaldo.sony1898@gmail.com', 'Elder Care System');
-        $mail->addAddress($toEmail, $toName); // Who receives the email
+        $mail->addAddress($toEmail, $toName);
 
-        
-        // Email content
-        
-        $mail->isHTML(true);         // Send as HTML email
-        $mail->Subject = $subject;   // Email subject line
-        $mail->Body    = $body;      // HTML version of the email
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
 
-        // Send the email
+        // Wrap body in a clean styled container
+        $mail->Body = "
+            <div style='font-family:Arial,sans-serif;max-width:650px;
+                        margin:auto;border:1px solid #ddd;
+                        border-radius:8px;padding:24px;'>
+                {$body}
+                <hr style='margin-top:30px;border:none;border-top:1px solid #eee;'>
+                <p style='color:#aaa;font-size:11px;text-align:center;'>
+                    Elder Care Home Management System &mdash; Automated Alert
+                </p>
+            </div>
+        ";
+
+        // Plain text fallback (strips HTML tags)
+        $mail->AltBody = strip_tags(str_replace(['<br>', '<br/>', '</p>', '</li>', '</h2>', '</h3>'], "\n", $body));
+
         $mail->send();
-        return true; // Email sent successfully
+        return true;
 
     } catch (Exception $e) {
-        // Log the error to PHP error log but don't crash the page
-        error_log("Email sending failed to $toEmail: " . $mail->ErrorInfo);
-        return false; // Email failed
+        // Log error but do not crash the page
+        error_log("sendAlertEmail failed to [{$toEmail}]: " . $mail->ErrorInfo);
+        return false;
     }
 }
 ?>
