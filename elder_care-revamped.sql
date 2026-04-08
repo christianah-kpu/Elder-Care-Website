@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 08, 2026 at 03:26 AM
+-- Generation Time: Apr 08, 2026 at 07:17 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -76,7 +76,8 @@ CREATE TABLE `assignment` (
 INSERT INTO `assignment` (`assignmentID`, `residentSIN`, `empID`) VALUES
 (5, 123456789, 1),
 (6, 999999999, 2),
-(7, 123456789, 2);
+(7, 123456789, 2),
+(8, 999999999, 1);
 
 -- --------------------------------------------------------
 
@@ -492,7 +493,7 @@ ALTER TABLE `ai_trend_log`
 -- AUTO_INCREMENT for table `assignment`
 --
 ALTER TABLE `assignment`
-  MODIFY `assignmentID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `assignmentID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `caregiver`
@@ -510,7 +511,7 @@ ALTER TABLE `familymember`
 -- AUTO_INCREMENT for table `family_requests`
 --
 ALTER TABLE `family_requests`
-  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `healthreport`
@@ -546,7 +547,7 @@ ALTER TABLE `selfreport`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `user_status`
@@ -558,7 +559,7 @@ ALTER TABLE `user_status`
 -- AUTO_INCREMENT for table `verification_tokens`
 --
 ALTER TABLE `verification_tokens`
-  MODIFY `tokenID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `tokenID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- Constraints for dumped tables
