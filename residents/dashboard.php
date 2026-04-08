@@ -1,4 +1,7 @@
-<?php include '../includes/header.php'; ?>
+<?php
+$page_title = "Resident Dashboard"; 
+include '../includes/header.php'; 
+?>
 
 <div class="container mt-5">
 
