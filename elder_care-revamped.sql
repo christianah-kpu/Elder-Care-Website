@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 08, 2026 at 07:17 AM
+-- Generation Time: Apr 09, 2026 at 05:19 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -90,17 +90,19 @@ CREATE TABLE `caregiver` (
   `user_id` int(11) NOT NULL,
   `phone` varchar(15) DEFAULT NULL,
   `fname` varchar(50) DEFAULT NULL,
-  `lname` varchar(50) DEFAULT NULL
+  `lname` varchar(50) DEFAULT NULL,
+  `profilePhoto` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `caregiver`
 --
 
-INSERT INTO `caregiver` (`empID`, `user_id`, `phone`, `fname`, `lname`) VALUES
-(1, 20, NULL, 'Eve', 'Smith'),
-(2, 25, NULL, 'blue', 'lamp'),
-(3, 29, NULL, 'Dam', 'Sel');
+INSERT INTO `caregiver` (`empID`, `user_id`, `phone`, `fname`, `lname`, `profilePhoto`) VALUES
+(1, 20, NULL, 'Eve', 'James', NULL),
+(2, 25, NULL, 'blue', 'lamp', NULL),
+(3, 29, NULL, 'Dam', 'Sel', NULL),
+(4, 35, '5968973456', 'passion', 'compass', '69d75d4c9154b.png');
 
 -- --------------------------------------------------------
 
@@ -122,7 +124,7 @@ CREATE TABLE `familymember` (
 
 INSERT INTO `familymember` (`fmID`, `user_id`, `fname`, `lname`, `phone`) VALUES
 (1, 11, NULL, NULL, NULL),
-(2, 21, NULL, NULL, NULL),
+(2, 21, 'Christianah', 'Ade', '1113456785'),
 (3, 27, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
@@ -212,7 +214,6 @@ CREATE TABLE `medication` (
 --
 
 INSERT INTO `medication` (`medID`, `residentSIN`, `empID`, `medName`, `dose`, `timeScheduled`, `dateCreated`) VALUES
-(1, '999999999', 2, 'MediCation IV', '12ml', '15:30:00', '2026-04-06 20:50:13'),
 (3, '999999999', 2, 'paracetemol', '5ml', '22:40:00', '2026-04-06 21:28:41'),
 (4, '123456789', 2, 'paracetemol', '50mg', '03:00:00', '2026-04-06 22:30:55');
 
@@ -236,7 +237,6 @@ CREATE TABLE `medication_entry` (
 --
 
 INSERT INTO `medication_entry` (`entryID`, `medID`, `reportID`, `status`, `timeTaken`, `date`) VALUES
-(1, 1, 1, 'pending', NULL, '2026-04-06'),
 (2, 3, 2, 'pending', NULL, '2026-04-06'),
 (3, 4, 2, 'pending', NULL, '2026-04-06');
 
@@ -265,6 +265,7 @@ CREATE TABLE `resident` (
 
 INSERT INTO `resident` (`residentSIN`, `user_id`, `DoB`, `phone`, `profilePhoto`, `ECname`, `ECphone`, `ECemail`, `fname`, `lname`) VALUES
 ('123456789', 22, NULL, NULL, NULL, NULL, NULL, NULL, 'Adam', 'Smith'),
+('667877777', 34, '1960-06-07', '6048305765', '69d75a49cb3df.jpg', 'Holy', '8785765843', 'abc@gmail.com', 'Flavour', 'Nabania'),
 ('999999999', 26, NULL, NULL, NULL, NULL, NULL, NULL, 'john', 'doe');
 
 -- --------------------------------------------------------
@@ -311,7 +312,9 @@ INSERT INTO `users` (`user_id`, `username`, `email`, `password_hash`, `role`, `i
 (25, 'blamp', 'blue@lamp.com', '$2y$10$ZbxL8h5WOKvXov86j7cmHeOC3iuIWtAWZmmI2k4H8xseYDgmCPpwu', 'caregiver', 1, '2026-04-07 02:18:43'),
 (26, 'jdoe', 'jdoe@doe.com', '$2y$10$0qxMN5.VXM7VEsP6wAXhhOxufqQNkhnAirjgyIsJrFYPurvU5nNye', 'resident', 1, '2026-04-07 02:19:12'),
 (27, 'Fmilliar', 'christianah123.ac@gmail.com', '$2y$10$lXZNujqveZ0z6jVQ8CNP0ObeqFYzwji5pGQXJ6SmdBkLyYzj1pKIi', 'family', 1, '2026-04-07 11:20:05'),
-(29, 'Dam', 'dam@gmail.com', '$2y$10$G0GmP5aWyprb7ErAVK6bVeeSAl.JOBccRl4nalxi9gglc3QU3U8QG', 'caregiver', 0, '2026-04-08 01:15:05');
+(29, 'Dam', 'dam@gmail.com', '$2y$10$G0GmP5aWyprb7ErAVK6bVeeSAl.JOBccRl4nalxi9gglc3QU3U8QG', 'caregiver', 0, '2026-04-08 01:15:05'),
+(34, 'Flavour', 'adeyemochristianah03@gmail.com', '$2y$10$ih6aI/B0ASfA7nPEMgEm0uAklVsp3HNAez/Qw3G/bjsDeCtANsmhy', 'resident', 0, '2026-04-09 07:50:33'),
+(35, 'Passion', 'compass@gmail.com', '$2y$10$1LglTFimxORrPz./mscIOez6QwQhLXdDEYfJk/FT9SAhiNt2126xi', 'caregiver', 0, '2026-04-09 08:03:24');
 
 -- --------------------------------------------------------
 
@@ -337,7 +340,9 @@ INSERT INTO `user_status` (`id`, `user_id`, `status`) VALUES
 (13, 21, 'active'),
 (14, 24, 'suspended'),
 (15, 23, 'suspended'),
-(16, 27, 'active');
+(16, 27, 'active'),
+(17, 29, 'active'),
+(18, 26, 'active');
 
 -- --------------------------------------------------------
 
@@ -499,7 +504,7 @@ ALTER TABLE `assignment`
 -- AUTO_INCREMENT for table `caregiver`
 --
 ALTER TABLE `caregiver`
-  MODIFY `empID` int(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `empID` int(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `familymember`
@@ -547,13 +552,13 @@ ALTER TABLE `selfreport`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `user_status`
 --
 ALTER TABLE `user_status`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `verification_tokens`
@@ -645,4 +650,3 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
