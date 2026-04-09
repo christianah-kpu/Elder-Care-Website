@@ -1,4 +1,6 @@
-<?php $page_title="Family Member Dashboard";
+<?php 
+$page_title="Family Member Dashboard";
+
 include '../includes/header.php'; 
 require_once '../includes/db_connection.php';
 
@@ -30,11 +32,23 @@ if (!$family) {
 
     <div class="row">
 
+        <!--  Edit your profile -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Edit your profile information</h5>
+                    <p class="card-text">Edit your profile information.</p>
+                    <a href="profile.php" class="btn btn-primary">Go</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Request to be linked to a particular resident -->
         <div class="col-md-6 mb-4">
             <div class="card shadow h-100">
                 <div class="card-body text-center">
                     <h5 class="card-title">Request link to Resident</h5>
-                    <p class="card-text">View linked residents and their health summaries.</p>
+                    <p class="card-text">Request to be linked to a resident to have access to their file</p>
                     <a href="request_resident.php" class="btn btn-primary">Go</a>
                 </div>
             </div>
