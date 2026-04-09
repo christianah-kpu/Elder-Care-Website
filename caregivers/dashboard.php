@@ -12,11 +12,33 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'caregiver') {
 }
 
 include '../includes/header.php';
+
+// Fetch caregiver info
+$user_id = $_SESSION['user_id'];
+$stmt = $conn->prepare("SELECT fname, lname, profilePhoto FROM caregiver WHERE user_id=?");
+$stmt->execute([$user_id]);
+$caregiver = $stmt->fetch();
+
 ?>
 
 <div class="container mt-5">
 
     <h2 class="mb-4">Caregiver Dashboard</h2>
+
+    <!-- Profile Image -->
+    <div class="text-center mb-4">
+        <?php if(!empty($caregiver['profilePhoto']) && file_exists("../uploads/caregivers/".$caregiver['profilePhoto'])): ?>
+            <img src="../uploads/caregivers/<?= htmlspecialchars($caregiver['profilePhoto']) ?>" 
+                 alt="Profile Photo" class="rounded-circle shadow" style="width:150px;height:150px;object-fit:cover;">
+        <?php else: ?>
+            <!-- Default Avatar Icon -->
+            <div class="rounded-circle bg-light border shadow d-inline-flex justify-content-center align-items-center" 
+                 style="width:150px;height:150px;">
+                <i class="bi bi-person-fill" style="font-size:80px;color:#6c757d;"></i>
+            </div>
+        <?php endif; ?>
+        <h4 class="mt-2"><?= htmlspecialchars($caregiver['fname'] . ' ' . $caregiver['lname']) ?></h4>
+    </div>
 
     <div class="row">
 
@@ -68,4 +90,4 @@ include '../includes/header.php';
 
 </div>
 
-<?php include '../includes/footer.php'; ?> 
+<?php include '../includes/footer.php'; ?>
