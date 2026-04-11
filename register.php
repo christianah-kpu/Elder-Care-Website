@@ -28,21 +28,46 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $errors[] = "Username is required.";
     } else if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errors[] = "A valid email is required.";
-    } else if (empty($password)) {
-        $errors[] = "Password is required.";
-    } else if (strlen($password) < 10) {
-        $errors[] = "Password must be at least 10 characters long.";
-    } else if (!preg_match('/[!@#$%^&*()-+]/', $password)) {
-        $errors[] = "Password must contain at least one special character.";       
-    } else if (!preg_match('/[a-z]/', $password)) {
-        $errors[] = "Password must contain at least one lowercase letter.";
-    } else if (!preg_match('/[0-9]/', $password)) {
-        $errors[] = "Password must contain at least one number.";
-    } else if ($password !== $confirm_password) {
-        $errors[] = "Passwords do not match.";
     } else if (empty($fname) || empty($lname) || empty($phone)) {
         $errors[] = "First name, last name, and phone are required.";
     }
+
+    /* =========================
+       PASSWORD FIX (ONLY CHANGE)
+    ========================= */
+
+    $passwordErrors = [];
+
+    if (empty($password)) {
+        $passwordErrors[] = "Password is required.";
+    } else {
+
+        if (strlen($password) < 10) {
+            $passwordErrors[] = "Password must be at least 10 characters long.";
+        }
+
+        if (!preg_match('/[!@#$%^&*()-+]/', $password)) {
+            $passwordErrors[] = "Password must contain at least one special character.";
+        }
+
+        if (!preg_match('/[a-z]/', $password)) {
+            $passwordErrors[] = "Password must contain at least one lowercase letter.";
+        }
+
+        if (!preg_match('/[0-9]/', $password)) {
+            $passwordErrors[] = "Password must contain at least one number.";
+        }
+
+        if ($password !== $confirm_password) {
+            $passwordErrors[] = "Passwords do not match.";
+        }
+    }
+
+    $errors = array_merge($errors, $passwordErrors);
+
+    /* =========================
+       END PASSWORD FIX
+    ========================= */
 
     if (empty($errors)) {
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
@@ -105,18 +130,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 ?>
 
-<div class="auth-page container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
     <div class="card shadow p-4" style="width: 100%; max-width: 500px;">
         <h3 class="text-center mb-4">Sign Up</h3>
 
-        <!-- Display errors -->
         <?php if (!empty($errors)): ?>
             <div class="alert alert-danger">
                 <?php foreach ($errors as $error) echo "<p class='mb-1'>$error</p>"; ?>
             </div>
         <?php endif; ?>
 
-        <!-- Display success message -->
         <?php if (!empty($success)): ?>
             <div class="alert alert-success">
                 <?php echo $success; ?>
