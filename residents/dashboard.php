@@ -18,7 +18,7 @@ $stmt->execute([$user_id]);
 $resident = $stmt->fetch();
 ?>
 
-<div class="container mt-5">
+<div class="resident-dashboard container mt-5">
 
     <h2 class="mb-4">Resident Dashboard</h2>
 
@@ -45,7 +45,7 @@ $resident = $stmt->fetch();
                 <div class="card-body text-center">
                     <h5 class="card-title">View Profile</h5>
                     <p class="card-text">View and Edit your profile.</p>
-                    <a href="profile.php" class="btn btn-primary">Go</a>
+                    <a href="profile.php" class="btn btn-primary">Open</a>
                 </div>
             </div>
         </div>
@@ -56,7 +56,7 @@ $resident = $stmt->fetch();
                 <div class="card-body text-center">
                     <h5 class="card-title">View Health Records</h5>
                     <p class="card-text">See your health history and medications.</p>
-                    <a href="view_health.php" class="btn btn-primary">Go</a>
+                    <a href="view_health.php" class="btn btn-primary">Open</a>
                 </div>
             </div>
         </div>
@@ -67,7 +67,7 @@ $resident = $stmt->fetch();
                 <div class="card-body text-center">
                     <h5 class="card-title">Self Report</h5>
                     <p class="card-text">Report your mood, pain level, and sleep quality.</p>
-                    <a href="self_report.php" class="btn btn-success">Go</a>
+                    <a href="self_report.php" class="btn btn-success">Open</a>
                 </div>
             </div>
         </div>

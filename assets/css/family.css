@@ -1,0 +1,58 @@
+/* =========================
+   FAMILY PROFILE - FULL WIDTH LEFT BORDER
+========================= */
+
+.family-dashboard .text-center.mb-4 {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 15px;
+
+  background: #ffffff;
+
+  /* IMPORTANT: remove small width feel */
+  width: 100%;
+
+  padding: 18px 20px;
+  border-radius: 14px;
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+
+  text-align: left !important;
+
+  /* FULL LEFT ACCENT BORDER */
+  border-left: 6px solid #4e73df;
+}
+
+/* SMALL AVATAR */
+.family-dashboard .rounded-circle {
+  width: 75px !important;
+  height: 75px !important;
+
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  background: #eef2f7;
+  border: 2px solid #e3e8ef;
+}
+
+/* ICON */
+.family-dashboard .rounded-circle i {
+  font-size: 38px !important;
+  color: #6c757d;
+}
+
+/* TEXT */
+.family-dashboard h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.family-dashboard .text-muted {
+  margin: 0;
+  font-size: 13px;
+}

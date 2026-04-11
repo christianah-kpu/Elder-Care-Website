@@ -21,7 +21,20 @@ $username = $_SESSION['username'] ?? '';
     <title><?php echo $page_title ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/global.css">
+    <?php if (isset($_SESSION['role'])): ?>
+
+        <?php if ($_SESSION['role'] === 'admin'): ?>
+            <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/admin.css">
+        <?php elseif ($_SESSION['role'] === 'family'): ?>
+            <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/family.css">
+        <?php elseif ($_SESSION['role'] === 'resident'): ?>
+            <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/resident.css">
+        <?php elseif ($_SESSION['role'] === 'caregiver'): ?>
+            <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/caregiver.css">
+        <?php endif; ?>
+
+    <?php endif; ?>
   </head>
  <body class="d-flex flex-column min-vh-100">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">

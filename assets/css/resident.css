@@ -1,0 +1,91 @@
+/* =========================
+   RESIDENT DASHBOARD - UNIFIED PROFILE STYLE
+========================= */
+
+.resident-dashboard .text-center.mb-4 {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 15px;
+
+  background: #ffffff;
+  width: 100%;
+
+  padding: 18px 20px;
+  border-radius: 14px;
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+
+  text-align: left !important;
+
+  /* hospital accent border */
+  border-left: 6px solid #4e73df;
+}
+
+/* =========================
+   AVATAR (SMALL + CLEAN)
+========================= */
+
+.resident-dashboard .rounded-circle {
+  width: 75px !important;
+  height: 75px !important;
+
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  background: #eef2f7;
+  border: 2px solid #e3e8ef;
+}
+
+/* ICON INSIDE AVATAR */
+.resident-dashboard .rounded-circle i {
+  font-size: 38px !important;
+  color: #6c757d;
+}
+
+/* IMAGE INSIDE AVATAR */
+.resident-dashboard img.rounded-circle {
+  object-fit: cover;
+}
+
+/* =========================
+   NAME TEXT
+========================= */
+
+.resident-dashboard h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.resident-dashboard .card {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+  transition: 0.25s ease;
+}
+
+.resident-dashboard .card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.resident-dashboard .btn {
+  border-radius: 25px;
+  font-weight: 600;
+}
+
+.resident-dashboard .btn:hover {
+  transform: scale(1.05);
+}

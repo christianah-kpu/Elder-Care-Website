@@ -23,53 +23,62 @@ if ($status === 'suspended') {
 include "../includes/header.php";
 ?>
 
-<div class="container mt-5">
-    <h2 class="mb-4">Admin Dashboard</h2>
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card shadow h-100 text-center">
+<div class="admin-dashboard container mt-5">
+
+    <h2 class="mb-5 dashboard-title">Admin Dashboard</h2>
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <div class="card dashboard-card text-center">
                 <div class="card-body">
+                    <div class="card-icon">👤</div>
                     <h5 class="card-title">Manage Users</h5>
-                    <a href="manage_users.php" class="btn btn-primary">Go</a>
+                    <a href="manage_users.php" class="btn btn-go text-white mt-3">Open</a>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4 mb-4">
-            <div class="card shadow h-100 text-center">
+        <div class="col-md-4">
+            <div class="card dashboard-card text-center">
                 <div class="card-body">
+                    <div class="card-icon">🏠</div>
                     <h5 class="card-title">Approve Family Account</h5>
-                    <a href="approve_family.php" class="btn btn-primary">Go</a>
+                    <a href="approve_family.php" class="btn btn-go text-white mt-3">Open</a>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4 mb-4">
-            <div class="card shadow h-100 text-center">
+        <div class="col-md-4">
+            <div class="card dashboard-card text-center">
                 <div class="card-body">
+                    <div class="card-icon">📄</div>
                     <h5 class="card-title">Approve Family Request</h5>
-                    <a href="approve_family_request.php" class="btn btn-primary">Go</a>
+                    <a href="approve_family_request.php" class="btn btn-go text-white mt-3">Open</a>
                 </div>
             </div>
         </div>
 
-         <div class="col-md-4 mb-4">
-            <div class="card shadow h-100 text-center">
+        <div class="col-md-4">
+            <div class="card dashboard-card text-center">
                 <div class="card-body">
+                    <div class="card-icon">🧑‍⚕️</div>
                     <h5 class="card-title">Assign Caregivers</h5>
-                    <a href="assign_caregivers.php" class="btn btn-primary">Go</a>
+                    <a href="assign_caregivers.php" class="btn btn-go text-white mt-3">Open</a>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4 mb-4">
-            <div class="card shadow h-100 text-center">
+        <div class="col-md-4">
+            <div class="card dashboard-card text-center">
                 <div class="card-body">
+                    <div class="card-icon">📊</div>
                     <h5 class="card-title">Generate Reports</h5>
-                    <a href="generate_report.php" class="btn btn-primary">Go</a>
+                    <a href="generate_report.php" class="btn btn-go text-white mt-3">Open</a>
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 

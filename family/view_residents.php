@@ -2,90 +2,112 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-$page_title = "Family Dashboard";
+$page_title = "My Residents";
 
 session_start();
 require_once '../includes/db_connection.php';
 include '../includes/header.php';
 
-// Ensure user is family
+// CHECK FAMILY
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'family') {
     header("Location: ../login.php");
     exit;
 }
 
-// Get fmID
-$stmt = $conn->prepare("SELECT fmID FROM familymember WHERE user_id = ?");
+// GET fmID
+$stmt = $conn->prepare("SELECT fmID FROM familymember WHERE user_id=?");
 $stmt->execute([$_SESSION['user_id']]);
 $family = $stmt->fetch();
 
 if (!$family) {
-    echo "<div class='alert alert-warning text-center'>
-            Your account is awaiting admin approval.
-          </div>";
-    include '../includes/footer.php';
+    echo "<div class='alert alert-danger'>Family member not found.</div>";
     exit;
 }
 
 $fmID = $family['fmID'];
 
-// ===============================
-// FETCH APPROVED RESIDENTS
-// ===============================
+// =======================
+// FETCH LINKED RESIDENTS
+// =======================
 $stmt = $conn->prepare("
-    SELECT 
-        r.residentSIN,
-        r.fname,
-        r.lname,
-        r.phone,
-        u.email
-    FROM link l
-    JOIN resident r ON l.residentSIN = r.residentSIN
-    JOIN users u ON r.user_id = u.user_id
-    WHERE l.fmID = ? AND l.status = 'approved'
+SELECT r.residentSIN, r.fname, r.lname, r.phone, r.profilePhoto
+FROM resident r
+JOIN link l ON r.residentSIN = l.residentSIN
+WHERE l.fmID = ? AND l.status = 'approved'
+ORDER BY r.fname
 ");
 $stmt->execute([$fmID]);
 $residents = $stmt->fetchAll();
 ?>
 
-<div class="container py-4">
-    <h2 class="text-center mb-4">My Residents</h2>
+<div class="container mt-5">
 
-    <?php if (empty($residents)): ?>
-        <div class="alert alert-info text-center">
-            You are not linked to any residents yet.
-        </div>
-    <?php else: ?>
-        <table class="table table-bordered text-center">
-            <thead class="table-primary">
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>View</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($residents as $r): ?>
-                    <tr>
-                        <td><?= htmlspecialchars(($r['fname'] ?? '') . ' ' . ($r['lname'] ?? '')) ?></td>
-                        <td><?= htmlspecialchars($r['email']) ?></td>
-                        <td><?= htmlspecialchars($r['phone'] ?? '') ?></td>
-                        <td>
-                            <a href="view_resident.php?id=<?= $r['residentSIN'] ?>" 
-                               class="btn btn-primary btn-sm">
-                               View
-                            </a>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    <?php endif; ?>
+<h2 class="mb-4">My Linked Residents</h2>
+
+<div class="card shadow-sm">
+<div class="card-header bg-dark text-white">
+    <strong>Residents</strong>
 </div>
 
+<div class="card-body p-0" style="max-height:400px; overflow-y:auto;">
+
+<table class="table table-bordered text-center align-middle mb-0">
+<thead class="table-light sticky-top">
+<tr>
+    <th>Profile</th>
+    <th>Name</th>
+    <th>Phone</th>
+    <th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+<?php if ($residents): ?>
+<?php foreach ($residents as $r): ?>
+<tr>
+
+<td>
+<?php if (!empty($r['profilePhoto'])): ?>
+    <img src="../uploads/<?= htmlspecialchars($r['profilePhoto']) ?>"
+         style="width:50px; height:50px; object-fit:cover; border-radius:50%;">
+<?php else: ?>
+    <div style="font-size:40px; color:#6c757d;">
+        <i class="bi bi-person-circle"></i>
+    </div>
+<?php endif; ?>
+</td>
+
+<td><?= htmlspecialchars($r['fname']." ".$r['lname']) ?></td>
+<td><?= htmlspecialchars($r['phone'] ?? 'N/A') ?></td>
+
+<td>
+<a href="view_resident.php?sin=<?= $r['residentSIN'] ?>" 
+   class="btn btn-sm btn-primary">
+   View Details
+</a>
+</td>
+
+</tr>
+<?php endforeach; ?>
+<?php else: ?>
+<tr>
+<td colspan="4">No linked residents</td>
+</tr>
+<?php endif; ?>
+</tbody>
+
+</table>
+
+</div>
+</div>
+
+<!-- BACK -->
 <div class="text-center mt-4">
-    <a href="./dashboard.php" class="btn btn-danger">Back to Dashboard</a>
+<a href="dashboard.php" class="btn btn-secondary">
+    <i class="bi bi-arrow-left"></i> Dashboard
+</a>
+</div>
+
 </div>
 
 <?php include '../includes/footer.php'; ?>

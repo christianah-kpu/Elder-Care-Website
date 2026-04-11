@@ -8,82 +8,152 @@ session_start();
 require_once '../includes/db_connection.php';
 include '../includes/header.php';
 
-// Ensure caregiver
+// CHECK CAREGIVER
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'caregiver') {
     header("Location: ../login.php");
     exit;
 }
 
-// ===============================
-// GET empID
-// ===============================
-$stmt = $conn->prepare("SELECT empID FROM caregiver WHERE user_id = ?");
+// GET caregiver empID
+$stmt = $conn->prepare("SELECT empID FROM caregiver WHERE user_id=?");
 $stmt->execute([$_SESSION['user_id']]);
 $caregiver = $stmt->fetch();
 
 if (!$caregiver) {
-    die("Caregiver profile not found.");
+    echo "<div class='alert alert-danger'>Caregiver not found.</div>";
+    exit;
 }
 
 $empID = $caregiver['empID'];
 
-// ===============================
-// FETCH ASSIGNED RESIDENTS
-// ===============================
-$stmt = $conn->prepare("
-    SELECT 
-        r.residentSIN,
-        r.fname,
-        r.lname,
-        r.phone,
-        u.email
-    FROM assignment a
-    JOIN resident r ON a.residentSIN = r.residentSIN
-    JOIN users u ON r.user_id = u.user_id
-    WHERE a.empID = ?
-");
-$stmt->execute([$empID]);
+// FILTERS
+$name = $_GET['name'] ?? '';
+$date = $_GET['date'] ?? '';
+
+// =======================
+// FETCH RESIDENTS
+// =======================
+$query = "
+SELECT DISTINCT r.residentSIN, r.fname, r.lname, r.phone, r.profilePhoto
+FROM resident r
+JOIN assignment a ON r.residentSIN = a.residentSIN
+LEFT JOIN healthreport hr ON r.residentSIN = hr.residentSIN
+WHERE a.empID = ?
+";
+
+$params = [$empID];
+
+// FILTER NAME
+if (!empty($name)) {
+    $query .= " AND (r.fname LIKE ? OR r.lname LIKE ?)";
+    $params[] = "%$name%";
+    $params[] = "%$name%";
+}
+
+// FILTER DATE
+if (!empty($date)) {
+    $query .= " AND DATE(hr.dateOfCreation) = ?";
+    $params[] = $date;
+}
+
+$query .= " ORDER BY r.fname ASC";
+
+$stmt = $conn->prepare($query);
+$stmt->execute($params);
 $residents = $stmt->fetchAll();
 ?>
 
-<div class="container py-4">
-    <h2 class="text-center mb-4">My Assigned Residents</h2>
+<div class="container mt-5">
 
-    <?php if (empty($residents)): ?>
-        <p class="text-center">No residents assigned yet.</p>
-    <?php else: ?>
-        <table class="table table-bordered text-center">
-            <thead class="table-primary">
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($residents as $r): ?>
-                    <tr>
-                        <td>
-                            <?= htmlspecialchars(($r['fname'] ?? '') . ' ' . ($r['lname'] ?? '')) ?>
-                        </td>
-                        <td><?= htmlspecialchars($r['email'] ?? '') ?></td>
-                        <td><?= htmlspecialchars($r['phone'] ?? '') ?></td>
-                        <td>
-                            <a href="view_resident.php?id=<?= $r['residentSIN'] ?>" 
-                               class="btn btn-primary btn-sm">
-                                View
-                            </a>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    <?php endif; ?>
+<h2 class="mb-4">My Assigned Residents</h2>
+
+<!-- SEARCH -->
+<form method="GET" class="row g-3 mb-4">
+
+    <div class="col-md-4">
+        <label>Resident Name</label>
+        <input type="text" name="name" class="form-control"
+               value="<?= htmlspecialchars($name) ?>" placeholder="Enter name">
+    </div>
+
+    <div class="col-md-4">
+        <label>Date</label>
+        <input type="date" name="date" class="form-control"
+               value="<?= htmlspecialchars($date) ?>">
+    </div>
+
+    <div class="col-md-4 d-flex align-items-end">
+        <button class="btn btn-primary w-100">Search</button>
+    </div>
+
+</form>
+
+<!-- LIST -->
+<div class="card shadow-sm">
+<div class="card-header bg-dark text-white">
+    <strong>Residents List</strong>
+</div>
+
+<div class="card-body p-0" style="max-height:400px; overflow-y:auto;">
+
+<table class="table table-bordered text-center align-middle mb-0">
+<thead class="table-light sticky-top">
+<tr>
+    <th>Profile</th>
+    <th>Name</th>
+    <th>Phone</th>
+    <th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+<?php if (count($residents) > 0): ?>
+    <?php foreach ($residents as $r): ?>
+    <tr>
+
+        <!-- PROFILE IMAGE OR ICON -->
+        <td>
+            <?php if (!empty($r['profilePhoto'])): ?>
+                <img src="../uploads/<?= htmlspecialchars($r['profilePhoto']) ?>"
+                     style="width:50px; height:50px; object-fit:cover; border-radius:50%;">
+            <?php else: ?>
+                <div style="font-size:40px; color:#6c757d;">
+                    <i class="bi bi-person-exclamation"></i>
+                </div>
+            <?php endif; ?>
+        </td>
+
+        <td><?= htmlspecialchars($r['fname'] . " " . $r['lname']) ?></td>
+
+        <td><?= htmlspecialchars($r['phone'] ?? 'N/A') ?></td>
+
+        <td>
+            <a href="view_resident.php?sin=<?= $r['residentSIN'] ?>" 
+               class="btn btn-sm btn-primary">
+               View Details
+            </a>
+        </td>
+
+    </tr>
+    <?php endforeach; ?>
+<?php else: ?>
+<tr>
+    <td colspan="4">No residents found</td>
+</tr>
+<?php endif; ?>
+</tbody>
+
+</table>
+
+</div>
+</div>
+
 </div>
 
 <div class="text-center mt-4">
-    <a href="dashboard.php" class="btn btn-secondary">← Back</a>
+    <a href="dashboard.php" class="btn btn-secondary">
+        ← Back to Dashboard
+    </a>
 </div>
 
 <?php include '../includes/footer.php'; ?>

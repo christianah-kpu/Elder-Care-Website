@@ -1,0 +1,34 @@
+/* =========================
+   ADMIN DASHBOARD
+========================= */
+
+.admin-dashboard .dashboard-card {
+  text-align: center;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.admin-dashboard .card-icon {
+  font-size: 40px;
+  color: #4e73df;
+}
+
+.admin-dashboard table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.admin-dashboard thead th {
+  background: #f8f9fc !important;
+  font-weight: 600;
+}
+
+.admin-dashboard tbody tr:hover {
+  background: #f1f5ff !important;
+}
+
+.admin-dashboard .btn-go {
+  background: linear-gradient(135deg, #4e73df, #224abe);
+  color: white !important;
+  padding: 6px 18px;
+}

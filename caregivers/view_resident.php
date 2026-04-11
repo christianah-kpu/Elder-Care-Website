@@ -8,159 +8,199 @@ session_start();
 require_once '../includes/db_connection.php';
 include '../includes/header.php';
 
-// Ensure caregiver
+// CHECK CAREGIVER
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'caregiver') {
     header("Location: ../login.php");
     exit;
 }
 
-// ===============================
-// GET SIN FROM URL
-// ===============================
-if (!isset($_GET['id'])) {
-    echo "<div class='alert alert-danger text-center'>No resident selected.</div>";
-    include '../includes/footer.php';
+// CHECK SIN
+if (!isset($_GET['sin'])) {
+    echo "<div class='alert alert-danger'>No resident selected</div>";
     exit;
 }
 
-$residentSIN = $_GET['id'];
+$residentSIN = $_GET['sin'];
 
-// ===============================
-// GET empID
-// ===============================
-$stmt = $conn->prepare("SELECT empID FROM caregiver WHERE user_id = ?");
-$stmt->execute([$_SESSION['user_id']]);
-$caregiver = $stmt->fetch();
-
-if (!$caregiver) {
-    echo "<div class='alert alert-danger text-center'>Caregiver profile not found.</div>";
-    include '../includes/footer.php';
-    exit;
-}
-
-$empID = $caregiver['empID'];
-
-// ===============================
-// SECURITY CHECK
-// ===============================
-$stmt = $conn->prepare("
-    SELECT * FROM assignment 
-    WHERE residentSIN = ? AND empID = ?
-");
-$stmt->execute([$residentSIN, $empID]);
-
-if ($stmt->rowCount() === 0) {
-    echo "<div class='alert alert-danger text-center'>Access denied.</div>";
-    include '../includes/footer.php';
-    exit;
-}
-
-// ===============================
-// FETCH RESIDENT INFO
-// ===============================
-$stmt = $conn->prepare("
-    SELECT r.*, u.email
-    FROM resident r
-    JOIN users u ON r.user_id = u.user_id
-    WHERE r.residentSIN = ?
-");
+// =======================
+// FETCH RESIDENT
+// =======================
+$stmt = $conn->prepare("SELECT * FROM resident WHERE residentSIN=?");
 $stmt->execute([$residentSIN]);
 $resident = $stmt->fetch();
 
 if (!$resident) {
-    echo "<div class='alert alert-danger text-center'>Resident not found.</div>";
-    include '../includes/footer.php';
+    echo "<div class='alert alert-danger'>Resident not found</div>";
     exit;
 }
 
-// ===============================
-// FETCH HEALTH DATA
-// ===============================
+// =======================
+// FETCH HEALTH
+// =======================
 $stmt = $conn->prepare("
-    SELECT *
-    FROM healthreport
-    WHERE residentSIN = ?
-    ORDER BY dateOfCreation DESC
+SELECT * FROM healthreport
+WHERE residentSIN = ?
+ORDER BY dateOfCreation DESC
 ");
 $stmt->execute([$residentSIN]);
 $health = $stmt->fetchAll();
+
+// =======================
+// FETCH MEDICATIONS
+// =======================
+$stmt = $conn->prepare("
+SELECT medName, dose, timeScheduled
+FROM medication
+WHERE residentSIN = ?
+");
+$stmt->execute([$residentSIN]);
+$meds = $stmt->fetchAll();
+
+// =======================
+// FETCH MED STATUS
+// =======================
+$stmt = $conn->prepare("
+SELECT m.medName, me.status, me.timeTaken, me.date
+FROM medication_entry me
+JOIN medication m ON me.medID = m.medID
+WHERE m.residentSIN = ?
+ORDER BY me.date DESC
+");
+$stmt->execute([$residentSIN]);
+$medStatus = $stmt->fetchAll();
+
+// =======================
+// IMAGE LOGIC
+// =======================
+$imgPath = !empty($resident['profilePhoto']) 
+    ? "../uploads/" . $resident['profilePhoto'] 
+    : null;
 ?>
 
-<div class="container py-4">
+<div class="container mt-5">
 
-    <h2 class="text-center mb-4">Resident Details</h2>
+<!-- HEADER WITH IMAGE -->
+    <div class="card shadow-sm p-3 mb-4 text-center">
 
-    <!-- BASIC INFO -->
-    <div class="card mb-4 shadow">
-        <div class="card-body">
+        <?php if ($imgPath): ?>
+            <img src="<?= $imgPath ?>" 
+                style="width:100px; height:100px; object-fit:cover; border-radius:50%;">
+        <?php else: ?>
+            <!-- Bootstrap Icon Avatar -->
+            <div style="font-size:70px; color:#6c757d;">
+                <i class="bi bi-person-circle"></i>
+            </div>
+        <?php endif; ?>
 
-            <h4>Basic Information</h4>
+        <h3 class="mt-2"><?= $resident['fname'] . " " . $resident['lname'] ?></h3>
 
-            <p><strong>SIN:</strong> <?= htmlspecialchars($resident['residentSIN']) ?></p>
+    </div>
 
-            <p><strong>Name:</strong>
-                <?= htmlspecialchars(($resident['fname'] ?? '') . ' ' . ($resident['lname'] ?? '')) ?>
-            </p>
+    <!-- PROFILE INFO -->
+    <div class="card mb-4 p-3 shadow-sm">
+        <h5>Profile</h5>
+        <p><strong>Phone:</strong> <?= $resident['phone'] ?? 'N/A' ?></p>
+        <p><strong>Date of Birth:</strong> <?= $resident['DoB'] ?? 'N/A' ?></p>
 
-            <p><strong>Email:</strong> <?= htmlspecialchars($resident['email'] ?? '') ?></p>
+        <h6>Emergency Contact</h6>
+        <p>
+            <?= $resident['ECname'] ?? 'N/A' ?> |
+            <?= $resident['ECphone'] ?? 'N/A' ?> |
+            <?= $resident['ECemail'] ?? 'N/A' ?>
+        </p>
+    </div>
 
-            <p><strong>Phone:</strong> <?= htmlspecialchars($resident['phone'] ?? '') ?></p>
+    <!-- HEALTH HISTORY -->
+    <div class="card mb-4 p-3 shadow-sm">
+    <h5>Health History</h5>
 
-            <hr>
+    <div style="max-height:300px; overflow-y:auto;">
+        <table class="table table-bordered text-center">
+            <thead class="table-light sticky-top">
+                <tr>
+                    <th>Date</th>
+                    <th>BP</th>
+                    <th>Sugar</th>
+                    <th>Temp</th>
+                    <th>Heart</th>
+                </tr>
+            </thead>
 
-            <h5>Emergency Contact</h5>
-
-            <p><strong>Name:</strong> <?= htmlspecialchars($resident['ECname'] ?? '') ?></p>
-            <p><strong>Phone:</strong> <?= htmlspecialchars($resident['ECphone'] ?? '') ?></p>
-            <p><strong>Email:</strong> <?= htmlspecialchars($resident['ECemail'] ?? '') ?></p>
-
+            <tbody>
+                <?php foreach($health as $h): ?>
+                <tr>
+                    <td><?= date("Y-m-d H:i", strtotime($h['dateOfCreation'])) ?></td>
+                    <td><?= $h['bloodPressure'] ?></td>
+                    <td><?= $h['bloodSugar'] ?></td>
+                    <td><?= $h['temperature'] ?></td>
+                    <td><?= $h['heartRate'] ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
         </div>
     </div>
 
-    <!-- HEALTH DATA -->
-    <div class="card shadow">
-        <div class="card-body">
+    <!-- MEDICATIONS -->
+    <div class="card mb-4 p-3 shadow-sm">
+        <h5>Medications</h5>
 
-            <h4>Health Records</h4>
+        <?php if($meds): ?>
+        <ul>
+        <?php foreach($meds as $m): ?>
+            <li><?= $m['medName'] ?> (<?= $m['dose'] ?> at <?= $m['timeScheduled'] ?>)</li>
+        <?php endforeach; ?>
+        </ul>
+        <?php else: ?>
+        <p>No medications assigned</p>
+        <?php endif; ?>
+    </div>
 
-            <?php if (empty($health)): ?>
-                <p>No health records yet.</p>
-            <?php else: ?>
+    <!-- MEDICATION STATUS -->
+    <div class="card mb-4 p-3 shadow-sm">
+        <h5>Medication Status</h5>
 
-                <table class="table table-bordered text-center">
-                    <thead class="table-success">
-                        <tr>
-                            <th>Date</th>
-                            <th>Blood Pressure</th>
-                            <th>Blood Sugar</th>
-                            <th>Heart Rate</th>
-                            <th>Temperature</th>
-                        </tr>
-                    </thead>
+        <div style="max-height:250px; overflow-y:auto;">
+            <table class="table table-bordered text-center">
+                <thead class="table-light sticky-top">
+                    <tr>
+                        <th>Medicine</th>
+                        <th>Status</th>
+                        <th>Time Taken</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
 
-                    <tbody>
-                        <?php foreach ($health as $h): ?>
-                            <tr>
-                                <td><?= htmlspecialchars($h['dateOfCreation'] ?? '') ?></td>
-                                <td><?= htmlspecialchars($h['bloodPressure'] ?? '') ?></td>
-                                <td><?= htmlspecialchars($h['bloodSugar'] ?? '') ?></td>
-                                <td><?= htmlspecialchars($h['heartRate'] ?? '') ?></td>
-                                <td><?= htmlspecialchars($h['temperature'] ?? '') ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-
-                </table>
-
-            <?php endif; ?>
-
+            <tbody>
+            <?php foreach($medStatus as $ms): ?>
+            <tr>
+            <td><?= $ms['medName'] ?></td>
+            <td>
+            <span class="badge 
+            <?= $ms['status']=='taken'?'bg-success':
+            ($ms['status']=='missed'?'bg-danger':
+            ($ms['status']=='delayed'?'bg-warning':'bg-secondary')) ?>">
+            <?= ucfirst($ms['status']) ?>
+            </span>
+            </td>
+            <td><?= $ms['timeTaken'] ?? '—' ?></td>
+            <td><?= $ms['date'] ?></td>
+            </tr>
+            <?php endforeach; ?>
+            </tbody>
+            </table>
         </div>
     </div>
 
-</div>
+   <div class="text-center mt-4 d-flex justify-content-center gap-2">
+        <a href="view_residents.php" class="btn btn-outline-secondary">
+            ← Back to Residents
+        </a>
+        <a href="dashboard.php" class="btn btn-secondary">
+            Dashboard
+        </a>
+    </div>
 
-<div class="text-center mt-4">
-    <a href="view_residents.php" class="btn btn-secondary">← Back</a>
 </div>
 
 <?php include '../includes/footer.php'; ?>

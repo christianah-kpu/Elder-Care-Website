@@ -21,7 +21,7 @@ $caregiver = $stmt->fetch();
 
 ?>
 
-<div class="container mt-5">
+<div class="caregiver-dashboard container mt-5">
 
     <h2 class="mb-4">Caregiver Dashboard</h2>
 
@@ -48,7 +48,7 @@ $caregiver = $stmt->fetch();
                 <div class="card-body text-center">
                     <h5 class="card-title">Edit My Profile</h5>
                     <p class="card-text">Edit my personal profile information</p>
-                    <a href="profile.php" class="btn btn-primary">Go</a>
+                    <a href="profile.php" class="btn btn-primary">Open</a>
                 </div>
             </div>
         </div>
