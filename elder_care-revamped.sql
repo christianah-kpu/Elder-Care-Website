@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 09, 2026 at 05:19 PM
+-- Generation Time: Apr 11, 2026 at 10:55 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -125,7 +125,7 @@ CREATE TABLE `familymember` (
 INSERT INTO `familymember` (`fmID`, `user_id`, `fname`, `lname`, `phone`) VALUES
 (1, 11, NULL, NULL, NULL),
 (2, 21, 'Christianah', 'Ade', '1113456785'),
-(3, 27, NULL, NULL, NULL);
+(5, 38, 'Chris', 'Adeyemo', '1213456783');
 
 -- --------------------------------------------------------
 
@@ -190,8 +190,8 @@ CREATE TABLE `link` (
 --
 
 INSERT INTO `link` (`linkID`, `residentSIN`, `fmID`, `status`) VALUES
-(2, '999999999', 3, 'approved'),
-(4, '123456789', 2, 'approved');
+(4, '123456789', 2, 'approved'),
+(6, '999999999', 5, 'approved');
 
 -- --------------------------------------------------------
 
@@ -311,10 +311,10 @@ INSERT INTO `users` (`user_id`, `username`, `email`, `password_hash`, `role`, `i
 (22, 'adam', 'theyebird.com@gmail.com', '$2y$10$VZmkTUGilMffQX4cZDZQb.BLL8nQBPGYOQBQwHy9yJZM/eUD01FDW', 'resident', 1, '2026-04-06 20:31:32'),
 (25, 'blamp', 'blue@lamp.com', '$2y$10$ZbxL8h5WOKvXov86j7cmHeOC3iuIWtAWZmmI2k4H8xseYDgmCPpwu', 'caregiver', 1, '2026-04-07 02:18:43'),
 (26, 'jdoe', 'jdoe@doe.com', '$2y$10$0qxMN5.VXM7VEsP6wAXhhOxufqQNkhnAirjgyIsJrFYPurvU5nNye', 'resident', 1, '2026-04-07 02:19:12'),
-(27, 'Fmilliar', 'christianah123.ac@gmail.com', '$2y$10$lXZNujqveZ0z6jVQ8CNP0ObeqFYzwji5pGQXJ6SmdBkLyYzj1pKIi', 'family', 1, '2026-04-07 11:20:05'),
 (29, 'Dam', 'dam@gmail.com', '$2y$10$G0GmP5aWyprb7ErAVK6bVeeSAl.JOBccRl4nalxi9gglc3QU3U8QG', 'caregiver', 0, '2026-04-08 01:15:05'),
 (34, 'Flavour', 'adeyemochristianah03@gmail.com', '$2y$10$ih6aI/B0ASfA7nPEMgEm0uAklVsp3HNAez/Qw3G/bjsDeCtANsmhy', 'resident', 0, '2026-04-09 07:50:33'),
-(35, 'Passion', 'compass@gmail.com', '$2y$10$1LglTFimxORrPz./mscIOez6QwQhLXdDEYfJk/FT9SAhiNt2126xi', 'caregiver', 0, '2026-04-09 08:03:24');
+(35, 'Passion', 'compass@gmail.com', '$2y$10$1LglTFimxORrPz./mscIOez6QwQhLXdDEYfJk/FT9SAhiNt2126xi', 'caregiver', 0, '2026-04-09 08:03:24'),
+(38, 'Chris', 'christianah123.ac@gmail.com', '$2y$10$VQi0UAsr1ZV4SE2CwyMQMecrvyF/LnycWKVKzSF7ruoNnUrSVK3Iy', 'family', 1, '2026-04-11 17:52:32');
 
 -- --------------------------------------------------------
 
@@ -364,7 +364,9 @@ CREATE TABLE `verification_tokens` (
 INSERT INTO `verification_tokens` (`tokenID`, `user_id`, `token`, `created_at`) VALUES
 (20, 23, '002711e8c830b6690578c691a048cb3f', '2026-04-07 03:13:44'),
 (21, 24, '780483f7e737534080bfaa6438f74402', '2026-04-07 03:14:38'),
-(26, 29, '180b27a6350d8d5908c089388e8ce368', '2026-04-08 03:15:05');
+(26, 29, '180b27a6350d8d5908c089388e8ce368', '2026-04-08 03:15:05'),
+(28, 36, '0d7ea0b71e6fb7164680d06caa2ec95d', '2026-04-11 10:41:44'),
+(29, 37, 'a0c654ef6af69d0927c3e2548803c7e1', '2026-04-11 10:42:51');
 
 --
 -- Indexes for dumped tables
@@ -510,13 +512,13 @@ ALTER TABLE `caregiver`
 -- AUTO_INCREMENT for table `familymember`
 --
 ALTER TABLE `familymember`
-  MODIFY `fmID` int(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `fmID` int(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `family_requests`
 --
 ALTER TABLE `family_requests`
-  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `healthreport`
@@ -528,7 +530,7 @@ ALTER TABLE `healthreport`
 -- AUTO_INCREMENT for table `link`
 --
 ALTER TABLE `link`
-  MODIFY `linkID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `linkID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `medication`
@@ -552,7 +554,7 @@ ALTER TABLE `selfreport`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT for table `user_status`
@@ -564,7 +566,7 @@ ALTER TABLE `user_status`
 -- AUTO_INCREMENT for table `verification_tokens`
 --
 ALTER TABLE `verification_tokens`
-  MODIFY `tokenID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `tokenID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- Constraints for dumped tables
