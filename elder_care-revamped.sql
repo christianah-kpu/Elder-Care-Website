@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 11, 2026 at 10:55 AM
+-- Generation Time: Apr 12, 2026 at 09:57 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -99,7 +99,7 @@ CREATE TABLE `caregiver` (
 --
 
 INSERT INTO `caregiver` (`empID`, `user_id`, `phone`, `fname`, `lname`, `profilePhoto`) VALUES
-(1, 20, NULL, 'Eve', 'James', NULL),
+(1, 20, NULL, 'Eve', 'James', '1775978519_5354141111_4a223906d3_c.jpg'),
 (2, 25, NULL, 'blue', 'lamp', NULL),
 (3, 29, NULL, 'Dam', 'Sel', NULL),
 (4, 35, '5968973456', 'passion', 'compass', '69d75d4c9154b.png');
@@ -264,7 +264,7 @@ CREATE TABLE `resident` (
 --
 
 INSERT INTO `resident` (`residentSIN`, `user_id`, `DoB`, `phone`, `profilePhoto`, `ECname`, `ECphone`, `ECemail`, `fname`, `lname`) VALUES
-('123456789', 22, NULL, NULL, NULL, NULL, NULL, NULL, 'Adam', 'Smith'),
+('123456789', 22, NULL, NULL, '1775979030_dove-logo-template-illustration-vector.jpg', NULL, NULL, NULL, 'Adam', 'Smith'),
 ('667877777', 34, '1960-06-07', '6048305765', '69d75a49cb3df.jpg', 'Holy', '8785765843', 'abc@gmail.com', 'Flavour', 'Nabania'),
 ('999999999', 26, NULL, NULL, NULL, NULL, NULL, NULL, 'john', 'doe');
 

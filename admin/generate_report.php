@@ -37,11 +37,11 @@ $careCount = $conn->query("SELECT COUNT(*) FROM caregiver")->fetchColumn();
 
 // MED SUMMARY
 $medSQL = "
-SELECT r.fname, r.lname, COUNT(me.entryID) as missed_count
-FROM resident r
-LEFT JOIN medication m ON r.residentSIN = m.residentSIN
-LEFT JOIN medication_entry me ON m.medID = me.medID AND me.status='missed'
-LEFT JOIN healthreport hr ON me.reportID = hr.reportID
+    SELECT r.fname, r.lname, COUNT(me.entryID) as missed_count
+    FROM resident r
+    LEFT JOIN medication m ON r.residentSIN = m.residentSIN
+    LEFT JOIN medication_entry me ON m.medID = me.medID AND me.status='missed'
+    LEFT JOIN healthreport hr ON me.reportID = hr.reportID
 ";
 
 if ($dateFilter) $medSQL .= " WHERE $dateFilter ";
@@ -53,13 +53,13 @@ $medSummary = $stmt->fetchAll();
 
 // HEALTH SUMMARY
 $healthSQL = "
-SELECT r.fname, r.lname,
-SUM(CASE WHEN hr.bloodPressure > 140 THEN 1 ELSE 0 END) AS abnormal_bp,
-SUM(CASE WHEN hr.bloodSugar > 180 THEN 1 ELSE 0 END) AS abnormal_sugar,
-SUM(CASE WHEN hr.temperature > 38 THEN 1 ELSE 0 END) AS high_temp,
-SUM(CASE WHEN hr.heartRate < 60 OR hr.heartRate > 100 THEN 1 ELSE 0 END) AS irregular_hr
-FROM resident r
-LEFT JOIN healthreport hr ON r.residentSIN = hr.residentSIN
+    SELECT r.fname, r.lname,
+    SUM(CASE WHEN hr.bloodPressure > 140 THEN 1 ELSE 0 END) AS abnormal_bp,
+    SUM(CASE WHEN hr.bloodSugar > 180 THEN 1 ELSE 0 END) AS abnormal_sugar,
+    SUM(CASE WHEN hr.temperature > 38 THEN 1 ELSE 0 END) AS high_temp,
+    SUM(CASE WHEN hr.heartRate < 60 OR hr.heartRate > 100 THEN 1 ELSE 0 END) AS irregular_hr
+    FROM resident r
+    LEFT JOIN healthreport hr ON r.residentSIN = hr.residentSIN
 ";
 
 if ($dateFilter) $healthSQL .= " WHERE $dateFilter ";
@@ -81,11 +81,11 @@ $healthSummary = $stmt->fetchAll();
 <form method="GET" class="row g-3 align-items-end">
 
 <div class="col-md-3">
-<label>Type</label>
-<select name="report_type" class="form-select">
-<option value="monthly" <?= $report_type=='monthly'?'selected':'' ?>>Monthly</option>
-<option value="yearly" <?= $report_type=='yearly'?'selected':'' ?>>Yearly</option>
-</select>
+    <label>Type</label>
+    <select name="report_type" class="form-select">
+    <option value="monthly" <?= $report_type=='monthly'?'selected':'' ?>>Monthly</option>
+    <option value="yearly" <?= $report_type=='yearly'?'selected':'' ?>>Yearly</option>
+    </select>
 </div>
 
 <div class="col-md-3">

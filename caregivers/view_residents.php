@@ -43,14 +43,12 @@ WHERE a.empID = ?
 
 $params = [$empID];
 
-// FILTER NAME
 if (!empty($name)) {
     $query .= " AND (r.fname LIKE ? OR r.lname LIKE ?)";
     $params[] = "%$name%";
     $params[] = "%$name%";
 }
 
-// FILTER DATE
 if (!empty($date)) {
     $query .= " AND DATE(hr.dateOfCreation) = ?";
     $params[] = $date;
@@ -108,37 +106,43 @@ $residents = $stmt->fetchAll();
 
 <tbody>
 <?php if (count($residents) > 0): ?>
-    <?php foreach ($residents as $r): ?>
-    <tr>
+<?php foreach ($residents as $r): ?>
 
-        <!-- PROFILE IMAGE OR ICON -->
-        <td>
-            <?php if (!empty($r['profilePhoto'])): ?>
-                <img src="../uploads/<?= htmlspecialchars($r['profilePhoto']) ?>"
-                     style="width:50px; height:50px; object-fit:cover; border-radius:50%;">
-            <?php else: ?>
-                <div style="font-size:40px; color:#6c757d;">
-                    <i class="bi bi-person-exclamation"></i>
-                </div>
-            <?php endif; ?>
-        </td>
+<?php
+$imgPath = "../uploads/residents/" . $r['profilePhoto'];
+?>
 
-        <td><?= htmlspecialchars($r['fname'] . " " . $r['lname']) ?></td>
+<tr>
 
-        <td><?= htmlspecialchars($r['phone'] ?? 'N/A') ?></td>
+<td>
+<?php if (!empty($r['profilePhoto']) && file_exists($imgPath)): ?>
+    <img src="<?= $imgPath ?>"
+         style="width:50px; height:50px; object-fit:cover; border-radius:50%;">
+<?php else: ?>
+    <div style="width:50px;height:50px;border-radius:50%;
+                display:flex;align-items:center;justify-content:center;
+                background:#f1f1f1;">
+        <i class="bi bi-person-exclamation" style="font-size:24px;"></i>
+    </div>
+<?php endif; ?>
+</td>
 
-        <td>
-            <a href="view_resident.php?sin=<?= $r['residentSIN'] ?>" 
-               class="btn btn-sm btn-primary">
-               View Details
-            </a>
-        </td>
+<td><?= htmlspecialchars($r['fname'] . " " . $r['lname']) ?></td>
+<td><?= htmlspecialchars($r['phone'] ?? 'N/A') ?></td>
 
-    </tr>
-    <?php endforeach; ?>
+<td>
+<a href="view_resident.php?sin=<?= $r['residentSIN'] ?>" 
+   class="btn btn-sm btn-primary">
+   View Details
+</a>
+</td>
+
+</tr>
+
+<?php endforeach; ?>
 <?php else: ?>
 <tr>
-    <td colspan="4">No residents found</td>
+<td colspan="4">No residents found</td>
 </tr>
 <?php endif; ?>
 </tbody>
@@ -151,9 +155,7 @@ $residents = $stmt->fetchAll();
 </div>
 
 <div class="text-center mt-4">
-    <a href="dashboard.php" class="btn btn-secondary">
-        ← Back to Dashboard
-    </a>
+    <a href="dashboard.php" class="btn btn-secondary">← Back to Dashboard</a>
 </div>
 
 <?php include '../includes/footer.php'; ?>

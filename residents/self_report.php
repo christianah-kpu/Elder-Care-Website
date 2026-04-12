@@ -73,6 +73,13 @@ include '../includes/header.php';
         </table>
     </div>
 
+
+    <!-- BACK -->
+    <div class="text-center mt-4">
+    <a href="dashboard.php" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Dashboard
+    </a>
+    </div>
 </div>
 
 <?php include '../includes/footer.php'; ?>

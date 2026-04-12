@@ -21,6 +21,7 @@ $family = $stmt->fetch();
 
 if (!$family) {
     echo "<div class='alert alert-danger'>Family member not found.</div>";
+    include '../includes/footer.php';
     exit;
 }
 
@@ -64,15 +65,23 @@ $residents = $stmt->fetchAll();
 <tbody>
 <?php if ($residents): ?>
 <?php foreach ($residents as $r): ?>
+
+<?php
+// FIXED IMAGE PATH
+$imgPath = "../uploads/residents/" . $r['profilePhoto'];
+?>
+
 <tr>
 
 <td>
-<?php if (!empty($r['profilePhoto'])): ?>
-    <img src="../uploads/<?= htmlspecialchars($r['profilePhoto']) ?>"
+<?php if (!empty($r['profilePhoto']) && file_exists($imgPath)): ?>
+    <img src="<?= $imgPath ?>"
          style="width:50px; height:50px; object-fit:cover; border-radius:50%;">
 <?php else: ?>
-    <div style="font-size:40px; color:#6c757d;">
-        <i class="bi bi-person-circle"></i>
+    <!-- DEFAULT ICON -->
+    <div class="d-flex justify-content-center align-items-center"
+         style="width:50px; height:50px; border-radius:50%; background:#f1f1f1;">
+        <i class="bi bi-person-fill" style="font-size:24px; color:#6c757d;"></i>
     </div>
 <?php endif; ?>
 </td>
@@ -88,11 +97,14 @@ $residents = $stmt->fetchAll();
 </td>
 
 </tr>
+
 <?php endforeach; ?>
 <?php else: ?>
+
 <tr>
 <td colspan="4">No linked residents</td>
 </tr>
+
 <?php endif; ?>
 </tbody>
 
@@ -101,10 +113,10 @@ $residents = $stmt->fetchAll();
 </div>
 </div>
 
-<!-- BACK -->
+<!-- BACK BUTTON -->
 <div class="text-center mt-4">
 <a href="dashboard.php" class="btn btn-secondary">
-    <i class="bi bi-arrow-left"></i> Dashboard
+    <i class="bi bi-arrow-left"></i> Back to Dashboard
 </a>
 </div>
 

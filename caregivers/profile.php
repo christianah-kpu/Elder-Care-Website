@@ -8,20 +8,20 @@ session_start();
 require_once '../includes/db_connection.php';
 include '../includes/header.php';
 
-// Flash message
+// FLASH
 if (isset($_SESSION['flash_message'])) {
-    echo "<div class='alert alert-success'>".$_SESSION['flash_message']."</div>";
+    echo "<div class='alert alert-success text-center'>".$_SESSION['flash_message']."</div>";
     unset($_SESSION['flash_message']);
 }
 
-// Ensure caregiver logged in
+// CHECK CAREGIVER
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'caregiver') {
     header("Location: ../login.php");
     exit;
 }
 
 // ===============================
-// FETCH CURRENT DATA
+// FETCH DATA
 // ===============================
 $stmt = $conn->prepare("
     SELECT c.*, u.email, u.username
@@ -39,7 +39,7 @@ if (!$caregiver) {
 }
 
 // ===============================
-// HANDLE UPDATE
+// UPDATE
 // ===============================
 if (isset($_POST['update_profile'])) {
 
@@ -48,9 +48,40 @@ if (isset($_POST['update_profile'])) {
     $phone = $_POST['phone'] ?: NULL;
     $email = $_POST['email'];
 
+    $imageName = $caregiver['profilePhoto']; // keep old image
+
+    // ===============================
+    // IMAGE UPLOAD
+    // ===============================
+    if (!empty($_FILES['profileImage']['name'])) {
+
+        $uploadDir = "../uploads/caregivers/";
+
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        $fileTmp = $_FILES['profileImage']['tmp_name'];
+        $fileName = time() . "_" . basename($_FILES['profileImage']['name']);
+        $targetFile = $uploadDir . $fileName;
+
+        $fileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+        $allowed = ['jpg', 'jpeg', 'png'];
+
+        if (in_array($fileType, $allowed)) {
+
+            if (move_uploaded_file($fileTmp, $targetFile)) {
+                $imageName = $fileName;
+            }
+
+        } else {
+            echo "<div class='alert alert-danger'>Only JPG, JPEG, PNG allowed.</div>";
+        }
+    }
+
     try {
 
-        // Update users table
+        // UPDATE USERS
         $stmt1 = $conn->prepare("
             UPDATE users 
             SET email = ?
@@ -58,13 +89,13 @@ if (isset($_POST['update_profile'])) {
         ");
         $stmt1->execute([$email, $_SESSION['user_id']]);
 
-        // Update caregiver table
+        // UPDATE CAREGIVER
         $stmt2 = $conn->prepare("
             UPDATE caregiver
-            SET fname = ?, lname = ?, phone = ?
-            WHERE user_id = ?
+            SET fname=?, lname=?, phone=?, profilePhoto=?
+            WHERE user_id=?
         ");
-        $stmt2->execute([$fname, $lname, $phone, $_SESSION['user_id']]);
+        $stmt2->execute([$fname, $lname, $phone, $imageName, $_SESSION['user_id']]);
 
         $_SESSION['flash_message'] = "Profile updated successfully!";
         header("Location: profile.php");
@@ -79,7 +110,26 @@ if (isset($_POST['update_profile'])) {
 <div class="container py-4">
     <h2 class="text-center mb-4">My Profile</h2>
 
-    <form method="POST" class="card shadow p-4">
+    <form method="POST" enctype="multipart/form-data" class="card shadow p-4">
+
+        <!-- PROFILE IMAGE -->
+        <div class="text-center mb-4">
+            <?php if(!empty($caregiver['profilePhoto']) && file_exists("../uploads/caregivers/".$caregiver['profilePhoto'])): ?>
+                <img src="../uploads/caregivers/<?= htmlspecialchars($caregiver['profilePhoto']) ?>" 
+                     class="rounded-circle shadow"
+                     style="width:120px;height:120px;object-fit:cover;">
+            <?php else: ?>
+                <div class="rounded-circle bg-light border d-inline-flex justify-content-center align-items-center"
+                     style="width:120px;height:120px;">
+                    <i class="bi bi-person-fill" style="font-size:60px;color:#6c757d;"></i>
+                </div>
+            <?php endif; ?>
+
+            <div class="mt-2">
+                <label class="form-label"><strong>Profile Image</strong></label>
+                <input type="file" name="profileImage" class="form-control form-control-sm">
+            </div>
+        </div>
 
         <h5>Basic Info</h5>
 
@@ -92,19 +142,19 @@ if (isset($_POST['update_profile'])) {
         <div class="mb-3">
             <label>Email</label>
             <input type="email" name="email" class="form-control"
-                value="<?= htmlspecialchars($caregiver['email'] ?? '') ?>">
+                value="<?= htmlspecialchars($caregiver['email'] ?? '') ?>" required>
         </div>
 
         <div class="mb-3">
             <label>First Name</label>
             <input type="text" name="fname" class="form-control"
-                value="<?= htmlspecialchars($caregiver['fname'] ?? '') ?>">
+                value="<?= htmlspecialchars($caregiver['fname'] ?? '') ?>" required>
         </div>
 
         <div class="mb-3">
             <label>Last Name</label>
             <input type="text" name="lname" class="form-control"
-                value="<?= htmlspecialchars($caregiver['lname'] ?? '') ?>">
+                value="<?= htmlspecialchars($caregiver['lname'] ?? '') ?>" required>
         </div>
 
         <div class="mb-3">

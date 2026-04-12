@@ -62,10 +62,19 @@ WHERE residentSIN=?
 $stmt->execute([$residentSIN]);
 $meds = $stmt->fetchAll();
 
-// IMAGE
-$imgPath = !empty($resident['profilePhoto']) 
-    ? "../uploads/".$resident['profilePhoto'] 
-    : null;
+// =======================
+// IMAGE (FIXED PATH)
+// =======================
+$imgPath = null;
+
+if (!empty($resident['profilePhoto'])) {
+    // FIX: match view_residents.php structure
+    $possiblePath = "../uploads/residents/" . $resident['profilePhoto'];
+
+    if (file_exists($possiblePath)) {
+        $imgPath = $possiblePath;
+    }
+}
 ?>
 
 <div class="container mt-5">
