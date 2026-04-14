@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Apr 12, 2026 at 09:57 AM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Host: 127.0.0.1:3306
+-- Generation Time: Apr 14, 2026 at 09:21 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -50,13 +50,6 @@ CREATE TABLE `ai_trend_log` (
   `last_checked` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `ai_trend_log`
---
-
-INSERT INTO `ai_trend_log` (`trendID`, `residentSIN`, `consecutive_abnormal_count`, `alert_sent`, `last_checked`) VALUES
-(2, '123456789', 3, 1, '2026-04-07 14:48:39');
-
 -- --------------------------------------------------------
 
 --
@@ -77,7 +70,8 @@ INSERT INTO `assignment` (`assignmentID`, `residentSIN`, `empID`) VALUES
 (5, 123456789, 1),
 (6, 999999999, 2),
 (7, 123456789, 2),
-(8, 999999999, 1);
+(8, 999999999, 1),
+(9, 667877777, 2);
 
 -- --------------------------------------------------------
 
@@ -102,7 +96,8 @@ INSERT INTO `caregiver` (`empID`, `user_id`, `phone`, `fname`, `lname`, `profile
 (1, 20, NULL, 'Eve', 'James', '1775978519_5354141111_4a223906d3_c.jpg'),
 (2, 25, NULL, 'blue', 'lamp', NULL),
 (3, 29, NULL, 'Dam', 'Sel', NULL),
-(4, 35, '5968973456', 'passion', 'compass', '69d75d4c9154b.png');
+(4, 35, '5968973456', 'passion', 'compass', '69d75d4c9154b.png'),
+(5, 39, '1111111111', 'Caroline', 'Giver', NULL);
 
 -- --------------------------------------------------------
 
@@ -151,10 +146,10 @@ CREATE TABLE `healthreport` (
   `reportID` int(10) UNSIGNED NOT NULL,
   `residentSIN` varchar(9) NOT NULL,
   `empID` int(10) UNSIGNED NOT NULL,
-  `heartRate` int(11) NOT NULL,
-  `bloodPressure` int(11) NOT NULL,
-  `bloodSugar` int(11) NOT NULL,
-  `temperature` int(11) NOT NULL,
+  `heartRate` int(11) DEFAULT NULL,
+  `bloodPressure` int(11) DEFAULT NULL,
+  `bloodSugar` int(11) DEFAULT NULL,
+  `temperature` int(11) DEFAULT NULL,
   `dateOfCreation` datetime NOT NULL DEFAULT current_timestamp(),
   `dateEdited` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -164,13 +159,20 @@ CREATE TABLE `healthreport` (
 --
 
 INSERT INTO `healthreport` (`reportID`, `residentSIN`, `empID`, `heartRate`, `bloodPressure`, `bloodSugar`, `temperature`, `dateOfCreation`, `dateEdited`) VALUES
-(1, '999999999', 2, 11, 123, 11, 11, '2026-04-06 19:53:00', '2026-04-06 19:53:00'),
-(2, '999999999', 2, 0, 0, 0, 0, '2026-04-06 20:49:25', '2026-04-06 20:49:25'),
-(3, '999999999', 2, 0, 0, 0, 0, '2026-04-06 21:18:23', '2026-04-06 21:18:23'),
-(4, '999999999', 2, 11, 12, 11, 11, '2026-04-06 21:36:58', '2026-04-06 21:36:58'),
+(1, '999999999', 2, 999999, 999999, 11999999, 11999999, '2026-04-06 19:53:00', '2026-04-14 11:56:02'),
+(2, '999999999', 2, 99, 0, 0, 0, '2026-04-07 20:49:25', '2026-04-14 12:00:08'),
+(3, '999999999', 2, 0, 0, 0, 0, '2026-04-08 21:18:23', '2026-04-14 12:00:19'),
+(4, '999999999', 2, 11, 12, 11, 11, '2026-04-09 21:36:58', '2026-04-14 12:00:25'),
 (10, '123456789', 2, 200, 200, 500, 300, '2026-04-07 14:48:08', '2026-04-07 14:48:08'),
 (11, '123456789', 2, 4238824, 500, 290049, 52995, '2026-04-07 14:48:20', '2026-04-07 14:48:20'),
-(12, '123456789', 2, 838838, 8888494, 299299, 993939, '2026-04-07 14:48:34', '2026-04-07 14:48:34');
+(12, '123456789', 2, 838838, 8888494, 299299, 993939, '2026-04-07 14:48:34', '2026-04-07 14:48:34'),
+(13, '999999999', 2, 36, 72, 90, 5, '2026-04-10 20:28:25', '2026-04-14 12:00:37'),
+(14, '999999999', 2, 11, 11, 11, 30, '2026-04-11 20:34:33', '2026-04-14 12:00:50'),
+(22, '123456789', 2, NULL, NULL, NULL, NULL, '2026-04-14 00:59:57', '2026-04-14 00:59:57'),
+(23, '999999999', 2, 45, 300, 300, 30, '2026-04-12 00:59:57', '2026-04-14 12:00:57'),
+(24, '667877777', 2, NULL, NULL, NULL, NULL, '2026-04-14 00:59:57', '2026-04-14 00:59:57'),
+(25, '999999999', 2, 45, 300, 300, 30, '2026-04-14 12:01:24', '2026-04-14 12:01:45'),
+(26, '555444666', 2, NULL, NULL, NULL, NULL, '2026-04-14 12:08:31', '2026-04-14 12:08:31');
 
 -- --------------------------------------------------------
 
@@ -214,8 +216,8 @@ CREATE TABLE `medication` (
 --
 
 INSERT INTO `medication` (`medID`, `residentSIN`, `empID`, `medName`, `dose`, `timeScheduled`, `dateCreated`) VALUES
-(3, '999999999', 2, 'paracetemol', '5ml', '22:40:00', '2026-04-06 21:28:41'),
-(4, '123456789', 2, 'paracetemol', '50mg', '03:00:00', '2026-04-06 22:30:55');
+(7, '123456789', 2, 'medication1', '10mg', '10:40:00', '2026-04-12 20:46:35'),
+(9, '123456789', 2, 'Penecillin', '12g', '01:30:00', '2026-04-14 00:10:11');
 
 -- --------------------------------------------------------
 
@@ -237,8 +239,22 @@ CREATE TABLE `medication_entry` (
 --
 
 INSERT INTO `medication_entry` (`entryID`, `medID`, `reportID`, `status`, `timeTaken`, `date`) VALUES
-(2, 3, 2, 'pending', NULL, '2026-04-06'),
-(3, 4, 2, 'pending', NULL, '2026-04-06');
+(23, 7, 22, 'missed', NULL, '2026-04-14'),
+(24, 9, 22, 'pending', NULL, '2026-04-14');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `medication_log`
+--
+
+CREATE TABLE `medication_log` (
+  `logID` int(11) NOT NULL,
+  `medID` int(10) UNSIGNED NOT NULL,
+  `status` set('delayed','missed','','') DEFAULT NULL,
+  `alert_sent` tinyint(1) NOT NULL,
+  `logged_at` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -265,6 +281,7 @@ CREATE TABLE `resident` (
 
 INSERT INTO `resident` (`residentSIN`, `user_id`, `DoB`, `phone`, `profilePhoto`, `ECname`, `ECphone`, `ECemail`, `fname`, `lname`) VALUES
 ('123456789', 22, NULL, NULL, '1775979030_dove-logo-template-illustration-vector.jpg', NULL, NULL, NULL, 'Adam', 'Smith'),
+('555444666', 40, '1965-03-07', '6046667777', NULL, 'Emergen', '1112223333', 'email@email.com', 'ryan', 'sident'),
 ('667877777', 34, '1960-06-07', '6048305765', '69d75a49cb3df.jpg', 'Holy', '8785765843', 'abc@gmail.com', 'Flavour', 'Nabania'),
 ('999999999', 26, NULL, NULL, NULL, NULL, NULL, NULL, 'john', 'doe');
 
@@ -309,12 +326,14 @@ INSERT INTO `users` (`user_id`, `username`, `email`, `password_hash`, `role`, `i
 (20, 'Eve', 'evesmith@gmail.com', '$2y$10$G4y4D8GNl16FBcL8K0iKmem3OQg1Z9/qzVu.TntgEjsavmLzMxPlK', 'caregiver', 0, '2026-04-06 07:05:34'),
 (21, 'christianah', 'chris123.ac@gmail.com', '$2y$10$K60bWal7TOaxPUpofIA6SOFmdgGoKU63LOPgR4uWtl3oYVqxq5Zim', 'family', 1, '2026-04-06 20:09:37'),
 (22, 'adam', 'theyebird.com@gmail.com', '$2y$10$VZmkTUGilMffQX4cZDZQb.BLL8nQBPGYOQBQwHy9yJZM/eUD01FDW', 'resident', 1, '2026-04-06 20:31:32'),
-(25, 'blamp', 'blue@lamp.com', '$2y$10$ZbxL8h5WOKvXov86j7cmHeOC3iuIWtAWZmmI2k4H8xseYDgmCPpwu', 'caregiver', 1, '2026-04-07 02:18:43'),
+(25, 'blamp', 'm.degerness03@gmail.com', '$2y$10$ZbxL8h5WOKvXov86j7cmHeOC3iuIWtAWZmmI2k4H8xseYDgmCPpwu', 'caregiver', 1, '2026-04-07 02:18:43'),
 (26, 'jdoe', 'jdoe@doe.com', '$2y$10$0qxMN5.VXM7VEsP6wAXhhOxufqQNkhnAirjgyIsJrFYPurvU5nNye', 'resident', 1, '2026-04-07 02:19:12'),
 (29, 'Dam', 'dam@gmail.com', '$2y$10$G0GmP5aWyprb7ErAVK6bVeeSAl.JOBccRl4nalxi9gglc3QU3U8QG', 'caregiver', 0, '2026-04-08 01:15:05'),
 (34, 'Flavour', 'adeyemochristianah03@gmail.com', '$2y$10$ih6aI/B0ASfA7nPEMgEm0uAklVsp3HNAez/Qw3G/bjsDeCtANsmhy', 'resident', 0, '2026-04-09 07:50:33'),
 (35, 'Passion', 'compass@gmail.com', '$2y$10$1LglTFimxORrPz./mscIOez6QwQhLXdDEYfJk/FT9SAhiNt2126xi', 'caregiver', 0, '2026-04-09 08:03:24'),
-(38, 'Chris', 'christianah123.ac@gmail.com', '$2y$10$VQi0UAsr1ZV4SE2CwyMQMecrvyF/LnycWKVKzSF7ruoNnUrSVK3Iy', 'family', 1, '2026-04-11 17:52:32');
+(38, 'Chris', 'christianah123.ac@gmail.com', '$2y$10$VQi0UAsr1ZV4SE2CwyMQMecrvyF/LnycWKVKzSF7ruoNnUrSVK3Iy', 'family', 1, '2026-04-11 17:52:32'),
+(39, 'caregiver', 'machihelt@gmail.com', '$2y$10$LRea/ukLCv8dMcw1LrUxmOYm5A0k6Li1Eo4fconYV.P2.ypcJKTuO', 'caregiver', 0, '2026-04-14 19:04:21'),
+(40, 'Resident', 'resident@gmail.com', '$2y$10$PtWZ3Q/XqxSxyuAT6Fee0O0DzJStW.Ic4hSrJW5IFMpl0AZyWzy8q', 'resident', 0, '2026-04-14 19:08:24');
 
 -- --------------------------------------------------------
 
@@ -342,7 +361,8 @@ INSERT INTO `user_status` (`id`, `user_id`, `status`) VALUES
 (15, 23, 'suspended'),
 (16, 27, 'active'),
 (17, 29, 'active'),
-(18, 26, 'active');
+(18, 26, 'active'),
+(19, 38, 'active');
 
 -- --------------------------------------------------------
 
@@ -448,6 +468,13 @@ ALTER TABLE `medication_entry`
   ADD KEY `medication_entry_ibfk_2` (`reportID`);
 
 --
+-- Indexes for table `medication_log`
+--
+ALTER TABLE `medication_log`
+  ADD PRIMARY KEY (`logID`),
+  ADD KEY `medID` (`medID`);
+
+--
 -- Indexes for table `resident`
 --
 ALTER TABLE `resident`
@@ -494,19 +521,19 @@ ALTER TABLE `administrator`
 -- AUTO_INCREMENT for table `ai_trend_log`
 --
 ALTER TABLE `ai_trend_log`
-  MODIFY `trendID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `trendID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `assignment`
 --
 ALTER TABLE `assignment`
-  MODIFY `assignmentID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `assignmentID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `caregiver`
 --
 ALTER TABLE `caregiver`
-  MODIFY `empID` int(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `empID` int(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `familymember`
@@ -524,7 +551,7 @@ ALTER TABLE `family_requests`
 -- AUTO_INCREMENT for table `healthreport`
 --
 ALTER TABLE `healthreport`
-  MODIFY `reportID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `reportID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `link`
@@ -536,13 +563,19 @@ ALTER TABLE `link`
 -- AUTO_INCREMENT for table `medication`
 --
 ALTER TABLE `medication`
-  MODIFY `medID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `medID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `medication_entry`
 --
 ALTER TABLE `medication_entry`
-  MODIFY `entryID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `entryID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+
+--
+-- AUTO_INCREMENT for table `medication_log`
+--
+ALTER TABLE `medication_log`
+  MODIFY `logID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `selfreport`
@@ -554,13 +587,13 @@ ALTER TABLE `selfreport`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `user_status`
 --
 ALTER TABLE `user_status`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `verification_tokens`
@@ -635,6 +668,12 @@ ALTER TABLE `medication`
 ALTER TABLE `medication_entry`
   ADD CONSTRAINT `medication_entry_ibfk_1` FOREIGN KEY (`medID`) REFERENCES `medication` (`medID`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `medication_entry_ibfk_2` FOREIGN KEY (`reportID`) REFERENCES `healthreport` (`reportID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `medication_log`
+--
+ALTER TABLE `medication_log`
+  ADD CONSTRAINT `medication_log_ibfk_1` FOREIGN KEY (`medID`) REFERENCES `medication` (`medID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `resident`
