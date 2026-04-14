@@ -7,6 +7,7 @@ $page_title = "Manage Health Data";
 session_start();
 require_once '../includes/db_connection.php';
 require_once __DIR__ . '/../includes/ai_health_alert.php';
+require_once '../includes/medication_alert.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'caregiver') {
     header("Location: ../login.php");
@@ -38,20 +39,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_POST['report'])) {
         try {
+            date_default_timezone_set("America/Vancouver");
+            $today = date('Y-m-d');
             $residentSIN   = $_POST['resident_id'];
             $bloodPressure = (int)   $_POST['blood_pressure'];
             $bloodSugar    = (float) $_POST['blood_sugar'];
             $temperature   = (float) $_POST['temperature'];
             $heartRate     = (int)   $_POST['heart_rate'];
 
-            $stmt = $conn->prepare("
-                INSERT INTO healthreport
+            $stmt = $conn->prepare("SELECT reportID
+                                  FROM healthreport
+                                  WHERE residentSin = ? AND DATE(dateOfCreation) = ?");
+            $stmt->execute([$residentSIN, $today]);
+            $hrrow = $stmt->fetch();
+            if(!$hrrow) {
+                //if a health report with todays date is NOT found, create a
+                //new health report for today
+                $stmt = $conn->prepare("
+                    INSERT INTO healthreport
                     (residentSIN, empID, heartRate, bloodPressure, bloodSugar, temperature,
                      dateOfCreation, dateEdited)
-                VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())
-            ");
+                    VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())");
             $stmt->execute([$residentSIN, $empID, $heartRate, $bloodPressure, $bloodSugar, $temperature]);
 
+            }
+            else {
+                //if a health report with todays date IS found, overwrite
+                //it with the new info
+                $reportID = $hrrow['reportID'];
+                $stmt = $conn->prepare("UPDATE healthreport
+                                        SET bloodPressure = ?, bloodSugar = ?,
+                                            temperature = ?, heartRate = ?,
+                                            dateEdited = NOW(), empID = ?
+                                        WHERE reportID = ?");
+                $stmt->execute([$heartRate, $bloodPressure, $bloodSugar, $temperature, $empID, $reportID]);
+            }
+            
             $success = "Health data saved successfully. AI check ran for SIN: " . htmlspecialchars($residentSIN);
 
             // RUN AI HEALTH TREND CHECK
@@ -60,7 +83,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } catch (Throwable $t) {
                 $error = "AI ERROR: " . htmlspecialchars($t->getMessage()) . " in " . htmlspecialchars($t->getFile()) . " line " . $t->getLine();
             }
-
+            
+            try {
+                checkMissedMeds($conn);
+            } catch (Throwable $t) {
+                echo "AI ERROR: " . htmlspecialchars($t->getMessage()) . " in " . htmlspecialchars($t->getFile()) . " line " . $t->getLine();
+            }
         } catch (PDOException $e) {
             $error = "Error saving health report: " . $e->getMessage();
         }
