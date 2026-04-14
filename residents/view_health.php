@@ -3,7 +3,6 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 $page_title = "My Health Records";
-
 session_start();
 require_once '../includes/db_connection.php';
 include '../includes/header.php';
