@@ -69,7 +69,7 @@ function checkMissedMeds($conn) {
                 $stmt = $conn->prepare("UPDATE medication_entry
                         SET status = ?
                         WHERE entryID = ?");
-                $stmt->execute([$status, $_POST['entry']]);
+                $stmt->execute([$status, $med['entryID']]);
             } elseif ($timediff >= 60) {
                 $status = 'delayed';  // 1 to 15 min late
             }
