@@ -2,35 +2,28 @@
 $page_title = "Medication Status";
 include '../includes/header.php';
 require_once '../includes/db_connection.php';
+require_once '../includes/medication_alert.php';
 //require_once __DIR__ . '/../includes/medication_alert.php';
 //checkMissedMedications($conn);
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 $page_title = "Manage Medications";
-
-// ===============================
-// TEMPORARY - CHECKS SCHEDULED MEDICATIONS AND IF A DAILY ENTRY DOES NOT EXIST, CREATES ONE
-// TEMPORARY - USES A PLACEHOLDER HEALTH REPORT. NEEDS TO USE THE HEALTH REPORT FOR THAT DAY/SEGMENT
-// ===============================
-$today = date('Y-m-d');
-$error = '';
 date_default_timezone_set("America/Vancouver");
-$time = date('H:i');
-$stmt = $conn->prepare("SELECT m.medID
-                        FROM medication m
-                        LEFT JOIN medication_entry me on m.medID = me.medID
-                        WHERE me.date is NULL
-                        ");
-$stmt->execute();
-$unlisted_medications = $stmt->fetchAll();
-foreach($unlisted_medications as $um) {
-    $stmt = $conn->prepare("INSERT INTO medication_entry
-                            (medID, reportID)
-                            VALUES (?, 2)");
-    $stmt->execute([$um['medID']]);
+$today = date('Y-m-d');
+
+// FLASH MESSAGE
+if (isset($_SESSION['flash_message'])) {
+    echo "<div class='alert alert-success text-center'>".$_SESSION['flash_message']."</div>";
+    unset($_SESSION['flash_message']);
 }
 
+
+try {
+    checkMissedMeds($conn);
+} catch (Throwable $t) {
+    $_SESSION['flash_message'] =  "AI ERROR: " . htmlspecialchars($t->getMessage()) . " in " . htmlspecialchars($t->getFile()) . " line " . $t->getLine();
+}
 
 // ===============================
 // FETCH ASSIGNED RESIDENTS NAMES
@@ -50,74 +43,68 @@ $stmt = $conn->prepare("SELECT CONCAT(r.fname + ' ' + r.lname) as rname
                         WHERE a.empID = ?");
 $stmt->execute([$empID]);
 $rName = $stmt->fetchAll();
-
 // ===============================
 // GET MEDICATIONS FOR ASSIGNED RESIDENTS
 // ===============================
 $stmt = $conn->prepare("SELECT m.residentSIN as rSIN, m.medName, m.timeScheduled,
-                            r.fname, r.lname, m.dose, m.medID
-                        FROM medication m
+                            r.fname, r.lname, m.dose, me.entryID, me.status, m.medID
+                        FROM medication_entry me
+                        LEFT JOIN medication m ON me.medID = m.medID
                         JOIN assignment a ON m.residentSIN = a.residentSIN 
                         JOIN resident r ON a.residentSIN = r.residentSIN 
-                        WHERE a.empID = ?");
-$stmt->execute([$empID]);
+                        WHERE a.empID = ? AND me.date = ?");
+$stmt->execute([$empID, $today]);
 $rmeds = $stmt->fetchAll();
 
 // ===============================
 // HANDLES FORMS
 // ===============================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    try {
-        // ===============================
-        // MARK MEDICATION AS TAKEN
-        // ===============================
-        if(isset($_POST['mark_taken'])) {
-            
-            $stmt = $conn->prepare("SELECT me.entryID, m.timeScheduled as ts
-                                    FROM medication m
-                                    JOIN medication_entry me ON m.medID = me.medID 
-                                    WHERE m.medID = ? AND me.date = ?");
-            $stmt->execute([$_POST['medID'], (string) $today]);
-            $updtEntry = $stmt->fetchAll();
-            foreach($updtEntry as $ue) {
-                echo $ue['entryID'] . '<br>' . $ue['ts'];
-                if (strtotime($time)-strtotime($ue['ts']) >= 900) {
-                $stmt = $conn->prepare("UPDATE medication_entry me
-                                        SET me.status = 'delayed', me.timeTaken = ?
-                                        WHERE me.entryID = ?");
-                $stmt->execute([(string) $time, $ue['entryID']]);
-                }
-                else {
-                $stmt = $conn->prepare("UPDATE medication_entry me
-                                        SET me.status = 'taken', me.timeTaken = ?
-                                        WHERE me.entryID = ?");
-                $stmt->execute([(string) $time, $ue['entryID']]);
-                }
-            }
-            
-            
+
+    // ===============================
+    // MARK MEDICATION AS TAKEN
+    // ===============================
+    if(isset($_POST['mark'])) {
+        $status = 'pending';
+        date_default_timezone_set("America/Vancouver");
+        $time = date('H:i');
+            //recieves either missed or taken as input:
+            //is also passed by default:entryID, timing,
+            //and mark_taken OR mark_missed
+        if ($_POST['mark'] == 'mark_taken') {
+            if(strtotime($time)-strtotime($_POST['timing']) >= 900) {$status = 'delayed';}
+            else {$status = 'taken';}
+                $stmt = $conn->prepare("UPDATE medication_entry
+                                    SET status = ?, timeTaken = ?
+                                    WHERE entryID = ?");
+                $stmt->execute([$status, (string) $time, $_POST['entry']]);
+        }
+        else {
+            $status = 'missed';
+            $stmt = $conn->prepare("UPDATE medication_entry
+                                    SET status = ?
+                                    WHERE entryID = ?");
+            $stmt->execute([$status, $_POST['entry']]);
         }
 
-    } catch (PDOException $e) {
-        $error = "Error: " . $e->getMessage();
+        $_SESSION['flash_message'] = "Medication has been marked as " .
+        $status . "! ";
+        header("Location: medication_status.php");
+        exit;
     }
 
-        try {
-        // ===============================
-        // DELETE MEDICATION COMPLETELY
-        // ===============================
-        if (isset($_POST['delete'])) {
-            
-            $medStmt = $conn->prepare("DELETE FROM medication
-                                    WHERE medID = ?");
-            $medStmt->execute([$_POST['medID']]);
-
-            }
-    } catch (PDOException $e) {
-        $error = "Error: " . $e->getMessage();
-    }
+    // ===============================
+    // DELETE MEDICATION
+    // ===============================
+    if (isset($_POST['delete'])) {
+        $medStmt = $conn->prepare("DELETE FROM medication
+                                WHERE medID = ?");
+        $medStmt->execute([$_POST['medID']]);
+        $_SESSION['flash_message'] = "Medication successfully deleted.";
+        header("Location: medication_status.php");
+        exit;
+        }
 }
-echo $error;
 ?>
 
 
@@ -148,31 +135,28 @@ echo $error;
                 <td><?= htmlspecialchars($r['medName']) ?></td>
                 <td><?= htmlspecialchars($r['dose']) ?></td>
                 <td><?= htmlspecialchars($r['timeScheduled']) ?></td>
-                
+                <td><?= htmlspecialchars($r['status']) ?></td>
                 <td>
                 <form method="POST">
-                    <input type="hidden" name="medID" value="<?= $r['medID'] ?>">
-                    <input type="hidden" name="current_status" value="<?= $r['rSIN'] ?>">
+                    <input type="hidden" name="entry" value="<?= $r['entryID'] ?>">
+                    <input type="hidden" name="timing" value="<?= $r['timeScheduled'] ?>">
                 <!-- Mark a medication as taken. Will mark it as late automatically -->
-                    <button type="submit" name="mark_taken" value="mark_taken"
+                    <button type="submit" name="mark" value="mark_taken"
                                 class="btn btn-sm btn-success">
-                            Mark Taken
+                            Taken
+                    </button>
+                    <button type="submit" name="mark" value="mark_missed"
+                                class="btn btn-sm btn-danger">
+                            Missed
                     </button>
                 </form>
-                </td>
-                <td>
                 <form method="POST">
                     <input type="hidden" name="medID" value="<?= $r['medID'] ?>">
-                    <input type="hidden" name="current_status" value="<?= $r['rSIN'] ?>">
-                <!-- Currently does nothing. Intent is to allow the schedule to be edited
-                    <button type="submit" name="update" 
-                            class="btn btn-sm btn-success" style="margin-bottom:.2rem">
-                        Edit Medication
-                    </button><br> -->
-                <!-- Deletes the medication for resident - not just todays entry. -->
+                <!-- Removes the medication from the residents
+                 schedule - not just todays entry. -->
                     <button type="submit" name="delete" value="delete"
                             class="btn btn-sm btn-danger">
-                        Remove From Schedule
+                        Delete
                     </button>
                 </form>
                 </td>
