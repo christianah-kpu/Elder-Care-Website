@@ -3,7 +3,6 @@ $page_title = "Resident Dashboard";
 include '../includes/header.php'; 
 
 // Fetch resident info
-session_start();
 require_once '../includes/db_connection.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'resident') {

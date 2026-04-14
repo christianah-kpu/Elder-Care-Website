@@ -2,7 +2,6 @@
 $page_title = "Family Dashboard"; 
 include '../includes/header.php'; 
 
-session_start();
 require_once '../includes/db_connection.php';
 
 // Ensure logged in

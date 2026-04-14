@@ -2,8 +2,12 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 $page_title = "Admin - Manage Users";
 
+require '../vendor/autoload.php';
 session_start();
 require_once '../includes/db_connection.php';
 include '../includes/header.php';
@@ -163,7 +167,36 @@ if(isset($_POST['create_user'])){
             ]);
         }
 
-        $_SESSION['flash_message'] = "User created successfully!";
+        // Generate verification token
+        $verificationToken = bin2hex(random_bytes(16));
+        $createdAt = date('Y-m-d H:i:s');
+        $stmt = $conn->prepare("INSERT INTO verification_tokens (user_id, token, created_at) VALUES (?, ?, ?)");
+        $stmt->execute([$user_id, $verificationToken, $createdAt]);
+
+        // Send verification email
+        $verificationLink = "http://localhost/Elder-Care-Website/verify.php?token=$verificationToken";
+        $mail = new PHPMailer(true);
+
+        try {
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'ronaldo.sony1898@gmail.com';
+            $mail->Password   = 'jqlw fjem goyh ztam';
+            $mail->Port       = 587;
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->setFrom('ronaldo.sony1898@gmail.com', 'Sonny');
+            $mail->addAddress($email);
+            $mail->isHTML(true);
+            $mail->Subject = 'Verify Your Account';
+            $mail->Body    = "Click the link to verify your account: <a href='$verificationLink'>$verificationLink</a>";
+            $mail->AltBody = "Copy and paste this link to verify your account: $verificationLink";
+            $mail->send();
+            $_SESSION['flash_message'] = "User created successfully! Verification email sent to $email.";
+        } catch (Exception $e) {
+            $_SESSION['flash_message'] = "User created but email failed to send. Error: {$mail->ErrorInfo}";
+        }
+
         header("Location: manage_users.php");
         exit;
     } else {
@@ -171,6 +204,7 @@ if(isset($_POST['create_user'])){
             echo "<div class='alert alert-danger text-center'>$err</div>";
         }
     }
+
 }
 
 // -------------------------
